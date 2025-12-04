@@ -61,7 +61,7 @@ int my_getnbr(char const *str)
     }
     i = i + 1;
     length = length - i;
-    nbr_part = get_nbr_part(str, i, &length);
+    nbr_part = get_nbr_part((char *)(str), i, &length);
     if (length >= 5) {
         if (is_int_over(nbr_part, length) == 0) {
             return 0;

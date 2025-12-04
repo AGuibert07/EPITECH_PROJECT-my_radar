@@ -7,7 +7,7 @@
 
 #include "my.h"
 
-static int my_str_index_of(char c, char *str, int size)
+static int my_str_index_of(const char c, const char *str, const int size)
 {
     for (int i = 0; i < size; ++i) {
         if (str[i] == c) {

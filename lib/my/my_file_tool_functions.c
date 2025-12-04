@@ -16,7 +16,8 @@ static char **remove_blank_ending_lines(char **arr)
 {
     if (arr == NULL)
         return NULL;
-    for (int i = (my_word_array_len(arr) - 1); my_strlen(arr[i]) == 0; --i) {
+    for (int i = (my_word_array_len((const char **)(arr)) - 1);
+        my_strlen(arr[i]) == 0; --i) {
         free(arr[i]);
         arr[i] = 0;
     }
@@ -43,12 +44,34 @@ char **read_file(int fd, int buffer_size)
     char *buffer = NULL;
     char **arr = NULL;
 
-    if (buffer_size < 0)
+    if (buffer_size <= 0)
         return NULL;
     buffer = create_empty_buffer(size);
     if (buffer == NULL)
         return NULL;
     size = read(fd, buffer, buffer_size);
+    if (size < 0)
+        return NULL;
+    arr = my_split_str(buffer, '\n');
+    if (arr == NULL)
+        return NULL;
+    free(buffer);
+    return remove_blank_ending_lines(arr);
+}
+
+char **fread_file(FILE *file, int buffer_size)
+{
+    int size = buffer_size;
+    int index = 0;
+    char *buffer = NULL;
+    char **arr = NULL;
+
+    if (buffer_size <= 0)
+        return NULL;
+    buffer = create_empty_buffer(size);
+    if (buffer == NULL)
+        return NULL;
+    size = fread(buffer, buffer_size, buffer_size, file);
     if (size < 0)
         return NULL;
     arr = my_split_str(buffer, '\n');
@@ -81,11 +104,28 @@ char **get_file_content(char *filename)
 
     if (fd < 0)
         return NULL;
-    else if (file_size < 0) {
+    else if (file_size <= 0) {
         close(fd);
         return NULL;
     }
     content = read_file(fd, file_size);
     close(fd);
+    return content;
+}
+
+char **fget_file_content(char *filename)
+{
+    int file_size = get_file_size(filename);
+    FILE *file = fopen(filename, "r");
+    char **content = NULL;
+
+    if (file == NULL)
+        return NULL;
+    else if (file_size <= 0) {
+        fclose(file);
+        return NULL;
+    }
+    content = fread_file(file, file_size);
+    fclose(file);
     return content;
 }

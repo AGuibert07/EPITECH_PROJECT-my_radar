@@ -10,7 +10,7 @@
 
 int my_index_of_word_array(char *str, char **arr)
 {
-    int size = my_word_array_len(arr);
+    int size = my_word_array_len((const char **)(arr));
     int i = 0;
 
     while (my_strcmp(str, arr[i]) != 0 && i < size) {
@@ -25,8 +25,8 @@ int my_index_of_word_array(char *str, char **arr)
 
 char **my_word_array_concat(char **arr1, char **arr2)
 {
-    int size1 = my_word_array_len(arr1);
-    int size2 = my_word_array_len(arr2);
+    int size1 = my_word_array_len((const char **)(arr1));
+    int size2 = my_word_array_len((const char **)(arr2));
     char **arr;
     int index = 0;
 
@@ -41,4 +41,13 @@ char **my_word_array_concat(char **arr1, char **arr2)
     }
     arr[index] = 0;
     return arr;
+}
+
+int my_is_in_word_array(char *str, char **arr)
+{
+    for (int i = 0; i < my_word_array_len((const char **)(arr)); ++i) {
+        if (my_strcmp(str, arr[i]) == 0)
+            return 1;
+    }
+    return -1;
 }

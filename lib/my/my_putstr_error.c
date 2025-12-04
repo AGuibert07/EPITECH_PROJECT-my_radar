@@ -12,6 +12,6 @@ int my_putstr_error(char const *str)
 {
     int i = 0;
 
-    write(2, str, my_strlen(str));
+    write(STD_ERR, str, my_strlen(str));
     return 0;
 }

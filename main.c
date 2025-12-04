@@ -1,6 +1,6 @@
 /*
 ** EPITECH PROJECT, 2025
-** G1 - C Graphical Programming - my_hunter
+** G1 - C Graphical Programming - my_radar
 ** File description:
 ** main file of the project
 */
@@ -8,7 +8,7 @@
 #include <SFML/Graphics.h>
 #include "my.h"
 
-static int game_launch(void)
+/*static int radar_launch(void)
 {
     sfVideoMode mode = {SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP};
     sfRenderWindow *window = sfRenderWindow_create(mode, "My Hunter",
@@ -29,7 +29,7 @@ static int game_launch(void)
     free_structs(window, sprite_types, level);
     return EPITECH_SUCCESS;
 }
-
+*/
 static void print_help(void)
 {
     my_putstr("Air traffic simulation panel\n");
@@ -45,16 +45,18 @@ static void print_help(void)
 
 int main(int ac, char **av)
 {
-    if (ac > 1) {
-        if (ac == 2 && my_strcmp(av[1], "-h") == 0) {
-            print_help();
-            return EPITECH_SUCCESS;
-        } else {
-            my_putstr_error("my_hunter: invalid option(s): ");
-            my_putstr_error("the 'my_hunter' executable must be called only ");
-            my_putstr_error("without parameter or with the '-h' option\n");
-            return EPITECH_ECHEC;
-        }
+    char *path_to_script = NULL;
+
+    if (ac <= 1) {
+        my_putstr_error("my_hunter: missing parameter\n");
+        return EPITECH_ECHEC;
+    }
+    if (my_strcmp(av[1], "-h") == 0 ||
+        (ac > 2 && my_strcmp(av[2], "-r") == 0)) {
+        print_help();
+        return EPITECH_SUCCESS;
     } else
-        return game_launch();
+        path_to_script = av[ac - 1];
+    return 0;
+    // return radar_launch();
 }

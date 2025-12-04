@@ -25,7 +25,7 @@ int my_randint(const int min_val, const int max_val)
     int randint_val = 0;
 
     if (min_val > max_val)
-        my_swap(&min_val, &max_val);
+        my_swap((int *)(&min_val), (int *)(&max_val));
     if (min_val == max_val)
         return min_val;
     randint_val = (rand() % amplitude) + min_val;

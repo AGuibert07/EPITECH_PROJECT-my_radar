@@ -41,11 +41,8 @@ char *my_substring(char *str, int start_pos, unsigned int n)
     return new_string;
 }
 
-char **my_split_str(char *str, char sep)
+static int set_array(char **arr, char *str, char sep, int size)
 {
-    int size = my_strlen(str);
-    int nbr_occ = my_nbr_occurences_in_str(sep, str);
-    char **arr = malloc(sizeof(char *) * (nbr_occ + 2));
     int index = 0;
     int start = 0;
 
@@ -56,12 +53,30 @@ char **my_split_str(char *str, char sep)
             index += 1;
         }
     }
-    if (start < size) {
+    if (start < size)
         arr[index] = my_substring(str, start, (size - start));
-    } else {
-        arr[index] = my_substring(str, 0, 0);
+    else
+        arr[index] = my_strdup("");
+    if (arr[index] == NULL) {
+        free_array((void **)(arr), 2);
+        return EPITECH_ECHEC;
     }
     arr[index + 1] = 0;
+    return EPITECH_SUCCESS;
+}
+
+char **my_split_str(char *str, char sep)
+{
+    const int size = my_strlen(str);
+    int nbr_occ = my_nbr_occurences_in_str(sep, str);
+    char **arr = malloc(sizeof(char *) * (nbr_occ + 2));
+    int verif = 0;
+
+    if (arr == NULL)
+        return NULL;
+    verif = set_array(arr, str, sep, size);
+    if (verif != EPITECH_SUCCESS)
+        return NULL;
     return arr;
 }
 
@@ -80,23 +95,12 @@ static void check_string_char(char str_i, char *chars, char *str_new,
     }
 }
 
-char *my_replace_in_str(char *str, char c, char c_new)
+void my_replace_in_str(char *str, char c, char c_new)
 {
-    int size = my_strlen(str);
-    int size_new = size;
-    char *str_new;
-    int index = 0;
-    char chars[3] = {c, c_new, '\0'};
-
-    if (c_new == '\0') {
-        size_new = size - my_nbr_occurences_in_str(c, str);
+    for (int i = 0; str[i] != '\0'; ++i) {
+        if (str[i] == c)
+            str[i] = c_new;
     }
-    str_new = malloc(sizeof(char) * (size_new + 1));
-    for (int i = 0; i < size; ++i) {
-        check_string_char(str[i], chars, str_new, &index);
-    }
-    str_new[index] = '\0';
-    return str_new;
 }
 
 char *my_str_concat(char *str1, char *str2)

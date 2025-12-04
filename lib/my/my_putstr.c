@@ -12,6 +12,6 @@ int my_putstr(char const *str)
 {
     int i = 0;
 
-    write(1, str, my_strlen(str));
+    write(STD_OUT, str, my_strlen(str));
     return 0;
 }
