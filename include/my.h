@@ -28,6 +28,11 @@
     #define STD_OUT 1
     #define STD_ERR 2
 
+enum bool {
+    TRUE,
+    FALSE
+} typedef bool_t;
+
 char *convert_char_to_str(char c);
 void my_putchar(char c);
 int my_isneg(int n);
@@ -80,7 +85,7 @@ char *my_str_concat(char *str1, char *str2);
 char *my_str_n_concat(unsigned int n, ...);
 char *my_char_n_concat(unsigned int n, ...);
 char **my_word_array_concat(char **arr1, char **arr2);
-char *my_int_to_str_function(int nbr, char *base);
+char *my_int_to_str_function(int nbr, const char *base);
 int get_integer_part(double variable);
 char *my_double_to_str_function(double nbr_float, unsigned int nbr_deci);
 void my_show_int_arr(int *arr, int size);
@@ -96,5 +101,7 @@ char **fget_file_content(char *filename);
 void nfree(unsigned int n, ...);
 void nfree_array(unsigned int dim_nbr, unsigned int n, ...);
 int my_is_in_word_array(char *str, char **arr);
+char *my_str_join(const char *separator, const char **arr);
+char **my_string_arr_dup(char **arr);
 
 #endif /* MY_ */

@@ -7,6 +7,12 @@
 
 #include <SFML/Graphics.h>
 #include "my.h"
+#include "script_data.h"
+
+static int radar_launch(aircraft_data_t **planes, tower_data_t *towers)
+{
+    return EPITECH_SUCCESS;
+}
 
 /*static int radar_launch(void)
 {
@@ -43,20 +49,46 @@ static void print_help(void)
     my_putstr("  'S' key        enable/disable sprites.\n");
 }
 
+static int show_data(void **data)
+{
+    aircraft_data_t **planes = data[0];
+    tower_data_t **towers = data[1];
+
+    my_putstr("aircrafts :\n");
+    for (int i = 0; planes[i] != NULL; ++i) {
+        my_putchar('\t');
+        aircraft_data_print(planes[i]);
+        my_putchar('\n');
+    }
+    my_putstr("\ncontrol towers:\n");
+    for (int i = 0; towers[i] != NULL; ++i) {
+        my_putchar('\t');
+        tower_data_print(towers[i]);
+        my_putchar('\n');
+    }
+    return EPITECH_SUCCESS;
+}
+
 int main(int ac, char **av)
 {
     char *path_to_script = NULL;
+    void **script_data = NULL;
 
     if (ac <= 1) {
-        my_putstr_error("my_hunter: missing parameter\n");
+        my_putstr_error("my_radar: missing parameter\n");
         return EPITECH_ECHEC;
     }
     if (my_strcmp(av[1], "-h") == 0 ||
         (ac > 2 && my_strcmp(av[2], "-r") == 0)) {
         print_help();
         return EPITECH_SUCCESS;
-    } else
-        path_to_script = av[ac - 1];
-    return 0;
-    // return radar_launch();
+    }
+    path_to_script = av[ac - 1];
+    script_data = get_script_data_content(path_to_script);
+    if (script_data == NULL) {
+        my_putstr_error("my_radar: can not get the script file data\n");
+        return EPITECH_ECHEC;
+    }
+    // show_data(script_data);
+    return radar_launch();
 }

@@ -38,6 +38,7 @@ SRC	=	my_file_tool_functions.c	\
                 my_strcmp.c			\
                 my_strcpy.c			\
                 my_strdup.c			\
+                my_str_concat.c			\
                 my_str_isalpha.c		\
                 my_str_islower.c		\
                 my_str_isnum.c			\

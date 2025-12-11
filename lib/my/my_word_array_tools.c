@@ -5,6 +5,7 @@
 ** this file countains word array tool functions
 */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include "my.h"
 
@@ -50,4 +51,22 @@ int my_is_in_word_array(char *str, char **arr)
             return 1;
     }
     return -1;
+}
+
+char **my_string_arr_dup(char **arr)
+{
+    int size = my_word_array_len((const char **)(arr));
+    char **arr_new = malloc(sizeof(char *) * (size + 1));
+
+    if (arr_new == NULL)
+        return NULL;
+    for (int i = 0; i < size; ++i) {
+        arr_new[i] = my_strdup(arr[i]);
+        if (arr_new[i] == NULL) {
+            free(arr_new);
+            return NULL;
+        }
+    }
+    arr_new[size] = 0;
+    return arr_new;
 }

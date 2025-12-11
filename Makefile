@@ -9,19 +9,29 @@ CC		=	epiclang
 
 CPPFLAGS	=	-Iinclude/
 
-SRC		=	main.c
+SRC		=	src/main.c					\
+			src/script_data.c
 
 NAME	=	'my_radar'
 
 OBJ		=	$(SRC:.c=.o)
 
-all:	my_hunter
+all:	my_radar
 
 libmy.a:
 	cd lib/my && make re && cd ../../
 
-my_hunter:	libmy.a	$(OBJ)
-	$(CC) $(OBJ) -l csfml-graphics -l csfml-system -lm -L lib -l my -o $(NAME) $(CPPFLAGS)
+libmy_pull:
+	cd lib/libmy_repo && git pull && cd ../../
+
+libmy_cp:
+	cp -r lib/libmy_repo/* lib/my/
+	cp lib/libmy_repo/my.h include/my.h
+
+libmy_update:	libmy_pull libmy_cp
+
+my_radar:	libmy.a	$(OBJ)
+	$(CC) $(OBJ) -l csfml-graphics -L lib -l my -o $(NAME) $(CPPFLAGS)
 
 clean:
 	cd lib/my && rm -f && cd ../../
@@ -35,9 +45,9 @@ fclean:
 	rm -fr .vscode
 
 ffclean:	fclean
-	rm -f *.o lib/my/*.o $(NAME) src_files/*.o src_files/*/*.o
+	rm -f *.o lib/my/*.o $(NAME) src/*.o
 	rm -f lib/libmy.a
 
 re:	fclean all
 
-.PHONY:	all libmy.a my_hunter clean fclean ffclean re
+.PHONY:	all libmy.a libmy_pull libmy_cp libmy_update my_radar clean fclean ffclean re

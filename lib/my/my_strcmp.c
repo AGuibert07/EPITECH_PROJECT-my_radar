@@ -29,24 +29,22 @@ static int comparison(const char *s1, const char *s2, int *sizes, int i)
 
 int my_strcmp(char const *s1, char const *s2)
 {
-    int size1 = my_strlen(s1);
-    int size2 = my_strlen(s2);
-    int sizes[2];
+    int sizes[2] = {my_strlen(s1), my_strlen(s2)};
     int nb_it;
-    int i = 0;
 
-    sizes[0] = size1;
-    sizes[1] = size2;
-    if (size1 >= size2) {
-        nb_it = size1;
-    } else {
-        nb_it = size2;
-    }
-    while (i < nb_it) {
-        if (comparison(s1, s2, sizes, i) != 0) {
+    if (s1 == s2)
+        return 0;
+    if (s1 == NULL)
+        return *s2;
+    if (s2 == NULL)
+        return *s1;
+    if (sizes[0] >= sizes[1])
+        nb_it = sizes[0];
+    else
+        nb_it = sizes[1];
+    for (int i = 0; i < nb_it; ++i) {
+        if (comparison(s1, s2, sizes, i) != 0)
             return comparison(s1, s2, sizes, i);
-        }
-        i = i + 1;
     }
     return 0;
 }

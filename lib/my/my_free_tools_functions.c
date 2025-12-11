@@ -46,8 +46,9 @@ void nfree_array(unsigned int dim_nbr, unsigned int n, ...)
     va_start(list, n);
     for (int i = 0; i < n; ++i) {
         ptr = va_arg(list, void *);
-        if (ptr != NULL)
+        if (ptr != NULL) {
             free_array(ptr, dim_nbr);
+        }
     }
     va_end(list);
 }

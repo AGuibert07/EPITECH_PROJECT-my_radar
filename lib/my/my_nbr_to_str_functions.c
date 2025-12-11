@@ -18,39 +18,52 @@ static int get_nbr_digits(int nbr, int base)
     while (my_compute_power_rec(base, nbr_digits + 1) <= nbr) {
         nbr_digits += 1;
     }
-    return nbr_digits;
+    return nbr_digits + 1;
 }
 
-static void set_start_values_with_sign(int *nbr, int *sign, int *index)
+static char *concat_nbr_digits(int nbr, const char *base,
+    unsigned int nbr_digits)
 {
-    if (nbr < 0) {
-        *sign = 1;
-        *nbr = -(*nbr);
-        *index = 1;
+    int power_val = 0;
+    char *str_char = NULL;
+    char *temp = NULL;
+    char *str = NULL;
+
+    if (nbr_digits == 0)
+        return my_strdup("");
+    power_val = my_compute_power_rec(my_strlen(base), nbr_digits - 1);
+    str_char = convert_char_to_str(base[nbr / power_val]);
+    temp = concat_nbr_digits(nbr % power_val, base, nbr_digits - 1);
+    if (str_char == NULL || temp == NULL) {
+        nfree(2, str_char, temp);
+        return NULL;
     }
+    str = my_str_concat(str_char, temp);
+    nfree(2, temp, str_char);
+    return str;
 }
 
-char *my_int_to_str_function(int nbr, char *base)
+char *my_int_to_str_function(int nbr, const char *base)
 {
-    int base_val = my_strlen(base);
-    int nbr_digits = get_nbr_digits(nbr, base_val);
-    char *str;
+    int nbr_digits = get_nbr_digits(nbr, my_strlen(base));
     int sign = 0;
-    int index = 0;
-    int power_val;
+    char *str = NULL;
+    char *temp = NULL;
 
-    set_start_values_with_sign(&nbr, &sign, &index);
-    str = malloc(sizeof(char) * (nbr_digits + sign + 1));
-    if (sign == 1) {
-        str[0] = '-';
+    if (nbr == 0)
+        return convert_char_to_str(base[0]);
+    sign = SIGN(nbr);
+    nbr = ABS(nbr);
+    if (nbr_digits <= 1)
+        str = convert_char_to_str(base[nbr]);
+    str = concat_nbr_digits(nbr, base, nbr_digits);
+    if (str == NULL)
+        return NULL;
+    if (sign < 0) {
+        temp = str;
+        str = my_str_concat("-", temp);
+        free(temp);
     }
-    for (int i = nbr_digits; i >= 0; --i) {
-        power_val = my_compute_power_rec(base_val, i);
-        str[index] = base[nbr / power_val];
-        nbr = nbr % power_val;
-        index += 1;
-    }
-    str[index] = '\0';
     return str;
 }
 
