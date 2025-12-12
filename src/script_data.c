@@ -8,8 +8,9 @@
 #include <SFML/Graphics.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 #include "my.h"
-#include "script_data.h"
+#include "sprites_structs.h"
 
 static void set_vector(sfVector2i *vector, int x_val, int y_val)
 {
@@ -17,56 +18,93 @@ static void set_vector(sfVector2i *vector, int x_val, int y_val)
     (*vector).y = y_val;
 }
 
-static aircraft_data_t *aircraft_data_create(const char **data)
+static bool_t check_aircraft_arguments(const char **data)
 {
     int size = my_word_array_len(data);
-    aircraft_data_t *plane = malloc(sizeof(aircraft_data_t));
 
-    if (plane == NULL)
+    if (size != 7)
+        return FALSE;
+    for (int i = 1; i < size; ++i) {
+        if (my_str_isnum(data[i]) != 0)
+            return FALSE;
+    }
+    return TRUE;
+}
+
+static void set_move_vector_and_orientation(aircraft_t *plane)
+{
+    sfVector2f move = {(*plane).end_pos.x - (*plane).start_pos.x,
+        (*plane).end_pos.y - (*plane).start_pos.y};
+    double rad_angle = atan2f(move.y, move.x);
+    double degree_angle = RAD_TO_DEGREE(rad_angle);
+    double move_norm = sqrt((move.x * move.x) + (move.y * move.y));
+    double factor = (1.0 * (*plane).speed) / move_norm;
+
+    (*plane).orientation = degree_angle;
+    (*plane).move_vector.x = move.x * factor;
+    (*plane).move_vector.y = move.y * factor;
+}
+
+static aircraft_t *aircraft_create(const char **data)
+{
+    int size = my_word_array_len(data);
+    aircraft_t *plane = malloc(sizeof(aircraft_t));
+
+    if (plane == NULL || check_aircraft_arguments(data) != TRUE) {
+        nfree(1, plane);
         return NULL;
-    if (size != 7) {
+    }
+    (*plane).status = NOT_STARTED;
+    set_vector(&(*plane).start_pos, my_getnbr(data[1]), my_getnbr(data[2]));
+    set_vector(&(*plane).end_pos, my_getnbr(data[3]), my_getnbr(data[4]));
+    set_vector(&(*plane).position, (*plane).start_pos.x, (*plane).start_pos.y);
+    (*plane).speed = my_getnbr(data[5]);
+    set_move_vector_and_orientation(plane);
+    (*plane).delay = my_getnbr(data[6]);
+    (*plane).sf_sprite = sfSprite_create();
+    if ((*plane).sf_sprite == NULL) {
         free(plane);
         return NULL;
     }
-    for (int i = 1; i < size; ++i) {
-        if (my_str_isnum(data[i]) != 0) {
-            free(plane);
-            return NULL;
-        }
-    }
-    set_vector(&(*plane).start_pos, my_getnbr(data[1]), my_getnbr(data[2]));
-    set_vector(&(*plane).end_pos, my_getnbr(data[3]), my_getnbr(data[4]));
-    (*plane).speed = my_getnbr(data[5]);
-    (*plane).delay = my_getnbr(data[6]);
     return plane;
 }
 
-static tower_data_t *tower_data_create(const char **data)
+static bool_t check_tower_arguments(const char **data)
 {
     int size = my_word_array_len(data);
-    tower_data_t *tower = malloc(sizeof(tower_data_t));
 
-    if (tower == NULL)
-        return NULL;
-    if (size != 4) {
-        free(tower);
-        return NULL;
-    }
+    if (size != 4)
+        return FALSE;
     for (int i = 1; i < size; ++i) {
-        if (my_str_isnum(data[i]) != 0) {
-            free(tower);
-            return NULL;
-        }
+        if (my_str_isnum(data[i]) != 0)
+            return FALSE;
+    }
+    return TRUE;
+}
+
+static tower_t *tower_create(const char **data)
+{
+    int size = my_word_array_len(data);
+    tower_t *tower = malloc(sizeof(tower_t));
+
+    if (tower == NULL || check_tower_arguments == FALSE) {
+        nfree(1, tower);
+        return NULL;
     }
     set_vector(&(*tower).position, my_getnbr(data[1]), my_getnbr(data[2]));
     (*tower).area_radius = my_getnbr(data[3]);
+    (*tower).sf_sprite = sfSprite_create();
+    if ((*tower).sf_sprite == NULL) {
+        free(tower);
+        return NULL;
+    }
     return tower;
 }
 
-static aircraft_data_t **get_aircraft_data(const char **script_content)
+static aircraft_t **get_aircraft_data(const char **script_content)
 {
     int size = my_word_array_len(script_content);
-    aircraft_data_t **data = malloc(sizeof(aircraft_data_t *) * (size + 1));
+    aircraft_t **data = malloc(sizeof(aircraft_t *) * (size + 1));
     int index = 0;
     char **splited_line = NULL;
 
@@ -86,10 +124,10 @@ static aircraft_data_t **get_aircraft_data(const char **script_content)
     return data;
 }
 
-static tower_data_t **get_tower_data(const char **script_content)
+static tower_t **get_tower_data(const char **script_content)
 {
     int size = my_word_array_len(script_content);
-    tower_data_t **data = malloc(sizeof(tower_data_t *) * (size + 1));
+    tower_t **data = malloc(sizeof(tower_t *) * (size + 1));
     int index = 0;
     char **splited_line = NULL;
 
@@ -112,8 +150,8 @@ static tower_data_t **get_tower_data(const char **script_content)
 void **get_script_data_content(const char *file_name)
 {
     char **content = get_file_content((char *)(file_name));
-    aircraft_data_t **planes = NULL;
-    tower_data_t **towers = NULL;
+    aircraft_t **planes = NULL;
+    tower_t **towers = NULL;
     void **r_data = malloc(sizeof(void *) * 3);
 
     if (r_data == NULL || content == NULL) {
@@ -130,35 +168,4 @@ void **get_script_data_content(const char *file_name)
     r_data[1] = (void *)(towers);
     r_data[2] = NULL;
     return r_data;
-}
-
-void sf_vector_2i_print(sfVector2i *vector)
-{
-    my_putstr("( ");
-    my_put_nbr((*vector).x);
-    my_putstr(" ; ");
-    my_put_nbr((*vector).y);
-    my_putstr(" )");
-}
-
-void aircraft_data_print(aircraft_data_t *data)
-{
-    my_putstr("A ");
-    sf_vector_2i_print(&(*data).start_pos);
-    my_putstr(" -> ");
-    sf_vector_2i_print(&(*data).end_pos);
-    my_putstr(" - ");
-    my_put_nbr((*data).speed);
-    my_putstr("px/s ; ");
-    my_put_nbr((*data).delay);
-    my_putstr("sec");
-}
-
-void tower_data_print(tower_data_t *data)
-{
-    my_putstr("T ");
-    sf_vector_2i_print(&(*data).position);
-    my_putstr(" - ");
-    my_put_nbr((*data).area_radius);
-    my_putstr("px");
 }

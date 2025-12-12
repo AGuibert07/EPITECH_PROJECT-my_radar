@@ -10,6 +10,8 @@
 #ifndef SRCIPT_DATA_
     #define SRCIPT_DATA_
 
+
+
 struct aircraft_data {
     sfVector2i start_pos;
     sfVector2i end_pos;
