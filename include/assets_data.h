@@ -8,6 +8,16 @@
 #ifndef ASSETS_DATA_
     #define ASSETS_DATA_
 
+    #include <SFML/Graphics.h>
+
+    // backgrounds colors
+    #define _BG_1_ ((int [3]){182, 220, 244})
+    #define _BG_2_ ((int [3]){218, 240, 253})
+    #define _BG_3_ ((int[3]){0, 3, 6})
+    #define _BG_4_ ((int[3]){176, 175, 181})
+    #define _BG_5_ ((int[3]){255, 255, 255})
+    #define _BG_6_ ((int[3]){248, 248, 248})
+
     // backgrounds
     #define _BACKGROUNDS_PATHS_ ((char *[7]){"assets/backgrounds/world_map-1.png", \
         "assets/backgrounds/world_map-2.png", "assets/backgrounds/world_map-3.jpg", \
@@ -15,6 +25,8 @@
         "assets/backgrounds/world_map-6.avif", 0})
     #define _BACKGROUNDS_WIDTHS_ ((int [6]){4977, 2560, 480, 740, 455, 740})
     #define _BACKGROUNDS_HEIGHTS_ ((int [6]){2515, 1280, 270, 367, 262, 423})
+    #define _BACKGROUNDS_COLORS_ ((int *[6]){_BG_1_, _BG_2_, _BG_3_, _BG_4_, \
+        _BG_5_, _BG_6_})
 
     // sprites
     #define _PLANES_PATHS_ ((char *[2]){"assets/sprites/plane-1.png", 0})
