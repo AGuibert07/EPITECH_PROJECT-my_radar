@@ -30,11 +30,20 @@
     #define TOWER_PATH (_TOWERS_PATHS_[_TOWER_ID_ - 1])
     #define TOWER_WIDTH (_TOWERS_WIDTHS_[_TOWER_ID_ - 1])
     #define TOWER_HEIGHT (_TOWERS_HEIGHTS_[_TOWER_ID_ - 1])
+    #define CRASH_PATH (_CRASHS_PATHS_[_CRASH_ID_ - 1])
 
     // sprites data
-    #define PLANE_SIZE 24
-    #define TOWER_SIZE 25
+    #define PLANE_SIZE 16
+    #define PLANE_BOX_SIZE 20
+    #define TOWER_SIZE 20
     #define PLANE_SCALE ((1.0 * PLANE_SIZE) / PLANE_WIDTH)
     #define TOWER_SCALE ((1.0 * TOWER_SIZE) / TOWER_WIDTH)
+    #define BOX_LINE_SIZE 4
+
+    // frames
+    #define FRAME_FREQ 25
+    #define FRAME_FREQ_MAX 60
+    #define FRAME_TIME (1.0 / FRAME_FREQ)
+    #define TIME_TO_CRASH 1
 
 #endif /* DISPLAY_VALUES_ */

@@ -6,20 +6,23 @@
 */
 
 #include <SFML/Graphics.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include "my.h"
 #include "sprites_structs.h"
 #include "display_values.h"
+#include "render_screen.h"
 
 static sfSprite *get_background(sfTexture *texture)
 {
     sfSprite *sprite = sfSprite_create();
     sfVector2f scale_bg = {1, 1};
     double bg_scale_factor = 0;
-    double bg_ratio = (1.0 * BACKGROUND_WIDTH) / BACKGROUND_HEIGHT;
+    sfVector2f position = {1, 1};
 
     if (sprite == NULL)
         return NULL;
-    if (bg_ratio >= SCREEN_RATIO)
+    if (((1.0 * BACKGROUND_WIDTH) / BACKGROUND_HEIGHT) >= SCREEN_RATIO)
         bg_scale_factor = (1.0 * SCREEN_WIDTH) / BACKGROUND_WIDTH;
     else
         bg_scale_factor = (1.0 * SCREEN_HEIGHT) / BACKGROUND_HEIGHT;
@@ -27,7 +30,31 @@ static sfSprite *get_background(sfTexture *texture)
     scale_bg.y = bg_scale_factor;
     sfSprite_setTexture(sprite, texture, sfFalse);
     sfSprite_setScale(sprite, scale_bg);
+    position.x = (SCREEN_WIDTH - (BACKGROUND_WIDTH * bg_scale_factor)) / 2.0;
+    position.y = (SCREEN_HEIGHT - (BACKGROUND_HEIGHT * bg_scale_factor)) / 2.0;
+    sfSprite_setPosition(sprite, position);
     return sprite;
+}
+
+static bool_t set_sprites_boxes(aircraft_t **planes, tower_t **towers)
+{
+    sfVector2f size = {PLANE_BOX_SIZE, PLANE_BOX_SIZE};
+    sfColor plane_box_color = sfColor_fromRGB(252, 220, 119);
+    sfColor tower_box_color = sfColor_fromRGB(186, 217, 165);
+
+    for (int i = 0; planes[i] != NULL; ++i) {
+        sfRectangleShape_setSize((*planes[i]).box, size);
+        sfRectangleShape_setRotation((*planes[i]).box,
+            DEGREE_TO_RAD((*planes[i]).orientation));
+        sfRectangleShape_setOutlineColor((*planes[i]).box, plane_box_color);
+        sfRectangleShape_setOutlineThickness((*planes[i]).box, BOX_LINE_SIZE);
+    }
+    for (int i = 0; towers[i] != NULL; ++i) {
+        sfCircleShape_setRadius((*towers[i]).zone, (*towers[i]).area_radius);
+        sfCircleShape_setOutlineColor((*towers[i]).zone, tower_box_color);
+        sfCircleShape_setOutlineThickness((*towers[i]).zone, BOX_LINE_SIZE);
+    }
+    return TRUE;
 }
 
 static bool_t set_sprites_textures(aircraft_t **planes, tower_t **towers)
@@ -36,32 +63,35 @@ static bool_t set_sprites_textures(aircraft_t **planes, tower_t **towers)
     double tower_scale_factor = (1.0 * TOWER_SIZE) / TOWER_WIDTH;
     sfVector2f plane_scale_vector = {plane_scale_factor, plane_scale_factor};
     sfVector2f tower_scale_vector = {tower_scale_factor, tower_scale_factor};
-    sfTexture *plane_texture = sfTexture_createFromImage(PLANE_PATH, NULL);
-    sfTexture *tower_texture = sfTexture_createFromImage(TOWER_PATH, NULL);
+    sfTexture *plane_texture = sfTexture_createFromFile(PLANE_PATH, NULL);
+    sfTexture *tower_texture = sfTexture_createFromFile(TOWER_PATH, NULL);
 
-    if (plane_texture == NULL || tower_texture)
+    if (plane_texture == NULL || tower_texture == NULL)
         return FALSE;
     for (int i = 0; planes[i] != NULL; ++i) {
         sfSprite_setTexture((*planes[i]).sf_sprite, plane_texture, sfFalse);
         sfSprite_setScale((*planes[i]).sf_sprite, plane_scale_vector);
+        sfSprite_setRotation((*planes[i]).sf_sprite,
+            DEGREE_TO_RAD((*planes[i]).orientation));
     }
     for (int i = 0; towers[i] != NULL; ++i) {
         sfSprite_setTexture((*towers[i]).sf_sprite, tower_texture, sfFalse);
         sfSprite_setScale((*towers[i]).sf_sprite, tower_scale_vector);
     }
-    return TRUE;
+    return set_sprites_boxes(planes, towers);
 }
 
 static sfTexture **get_textures(void)
 {
-    sfTexture **textures = malloc(sizeof(sfTexture *) * (4));
+    sfTexture **textures = malloc(sizeof(sfTexture *) * (5));
 
     if (textures == NULL)
         return NULL;
-    textures[0] = sfTexture_createFromImage(BACKGROUND_PATH, NULL);
-    textures[1] = sfTexture_createFromImage(PLANE_PATH, NULL);
-    textures[2] = sfTexture_createFromImage(TOWER_PATH, NULL);
-    textures[3] = NULL;
+    textures[0] = sfTexture_createFromFile(BACKGROUND_PATH, NULL);
+    textures[1] = sfTexture_createFromFile(PLANE_PATH, NULL);
+    textures[2] = sfTexture_createFromFile(TOWER_PATH, NULL);
+    textures[3] = sfTexture_createFromFile(CRASH_PATH, NULL);
+    textures[4] = NULL;
     if (textures[0] == NULL || textures[1] == NULL) {
         if (textures[0] != NULL)
             sfTexture_destroy(textures[0]);
@@ -75,21 +105,47 @@ static sfTexture **get_textures(void)
     return textures;
 }
 
-static int radar_launch(aircraft_t **planes, tower_t **towers)
+static void free_elements(sfRenderWindow *window, sfTexture **textures,
+    void **script_data, sfSprite *background)
+{
+    aircraft_t **planes = script_data[0];
+    tower_t **towers = script_data[1];
+
+    sfRenderWindow_destroy(window);
+    for (int i = 0; textures[i] != NULL; ++i) {
+        sfTexture_destroy(textures[i]);
+    }
+    free(textures);
+    for (int i = 0; planes[i] != NULL; ++i) {
+        sfSprite_destroy((*planes[i]).sf_sprite);
+        free(planes[i]);
+    }
+    free(planes);
+    for (int i = 0; towers[i] != NULL; ++i) {
+        sfSprite_destroy((*towers[i]).sf_sprite);
+        free(towers[i]);
+    }
+    free(towers);
+    sfSprite_destroy(background);
+}
+
+static int radar_launch(void **script_data)
 {
     sfVideoMode mode = {SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP};
     sfRenderWindow *window = sfRenderWindow_create(mode, "My Radar",
         sfClose | sfTitlebar, NULL);
     sfTexture **textures = get_textures();
     sfSprite *background = NULL;
+    int r_val = 0;
 
     if (textures == NULL)
         return EPITECH_ECHEC;
     background = get_background(textures[0]);
     if (background == NULL)
         return EPITECH_ECHEC;
-    // sfRenderWindow_display(window);
-    return EPITECH_SUCCESS;
+    r_val = render_radar(window, background, script_data, textures);
+    free_elements(window, textures, script_data, background);
+    return r_val;
 }
 
 static void print_help(void)
@@ -143,21 +199,22 @@ int main(int ac, char **av)
 {
     char *path_to_script = NULL;
     void **script_data = NULL;
-    aircraft_data_t **planes = NULL;
-    tower_data_t **towers = NULL;
     int verif = check_arguments(ac, av);
 
-    if (verif == EPITECH_ECHEC || verif == EPITECH_SUCCESS)
+    if (verif == EPITECH_ECHEC || verif == EPITECH_SUCCESS) {
+        if (verif != EPITECH_SUCCESS)
+            my_putstr_error("my_radar: invalid parameters\n");
         return verif;
+    }
     path_to_script = av[ac - 1];
     script_data = get_script_data_content(path_to_script);
     if (script_data == NULL) {
         my_putstr_error("my_radar: can not get the script file data\n");
         return EPITECH_ECHEC;
     }
-    planes = script_data[0];
-    towers = script_data[1];
-    if (set_sprites_textures(planes, towers) == FALSE)
+    if (set_sprites_textures(script_data[0], script_data[1]) == FALSE) {
+        my_putstr_error("my_radar: can not get textures\n");
         return EPITECH_ECHEC;
-    return radar_launch(planes, towers);
+    }
+    return radar_launch(script_data);
 }

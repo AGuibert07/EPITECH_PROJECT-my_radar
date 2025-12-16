@@ -11,8 +11,9 @@
 #include <math.h>
 #include "my.h"
 #include "sprites_structs.h"
+#include "display_values.h"
 
-static void set_vector(sfVector2i *vector, int x_val, int y_val)
+static void set_vector(sfVector2f *vector, int x_val, int y_val)
 {
     (*vector).x = x_val;
     (*vector).y = y_val;
@@ -31,7 +32,8 @@ static bool_t check_aircraft_arguments(const char **data)
     return TRUE;
 }
 
-static void set_move_vector_and_orientation(aircraft_t *plane)
+static void set_plane_values(aircraft_t *plane, unsigned int speed,
+    unsigned int delay)
 {
     sfVector2f move = {(*plane).end_pos.x - (*plane).start_pos.x,
         (*plane).end_pos.y - (*plane).start_pos.y};
@@ -39,10 +41,17 @@ static void set_move_vector_and_orientation(aircraft_t *plane)
     double degree_angle = RAD_TO_DEGREE(rad_angle);
     double move_norm = sqrt((move.x * move.x) + (move.y * move.y));
     double factor = (1.0 * (*plane).speed) / move_norm;
+    sfVector2f origin = {(1.0 * PLANE_SIZE) / 2, (1.0 * PLANE_SIZE) / 2};
 
+    (*plane).status = NOT_STARTED;
     (*plane).orientation = degree_angle;
     (*plane).move_vector.x = move.x * factor;
     (*plane).move_vector.y = move.y * factor;
+    (*plane).speed = speed;
+    (*plane).delay = delay;
+    (*plane).time_start_crash = -1.0;
+    (*plane).box = sfRectangleShape_create();
+    (*plane).sf_sprite = sfSprite_create();
 }
 
 static aircraft_t *aircraft_create(const char **data)
@@ -55,14 +64,13 @@ static aircraft_t *aircraft_create(const char **data)
         return NULL;
     }
     (*plane).status = NOT_STARTED;
-    set_vector(&(*plane).start_pos, my_getnbr(data[1]), my_getnbr(data[2]));
+    set_vector(&(*plane).start_pos, my_getnbr(data[1]) + (PLANE_SIZE / 2.0),
+        my_getnbr(data[2]) + (PLANE_SIZE / 2.0));
     set_vector(&(*plane).end_pos, my_getnbr(data[3]), my_getnbr(data[4]));
-    set_vector(&(*plane).position, (*plane).start_pos.x, (*plane).start_pos.y);
-    (*plane).speed = my_getnbr(data[5]);
-    set_move_vector_and_orientation(plane);
-    (*plane).delay = my_getnbr(data[6]);
-    (*plane).sf_sprite = sfSprite_create();
-    if ((*plane).sf_sprite == NULL) {
+    set_vector(&(*plane).position, (*plane).start_pos.x - (PLANE_SIZE / 2.0),
+        (*plane).start_pos.y - (PLANE_SIZE / 2.0));
+    set_plane_values(plane, my_getnbr(data[5]), my_getnbr(data[6]));
+    if ((*plane).sf_sprite == NULL || (*plane).box == NULL) {
         free(plane);
         return NULL;
     }
@@ -86,18 +94,24 @@ static tower_t *tower_create(const char **data)
 {
     int size = my_word_array_len(data);
     tower_t *tower = malloc(sizeof(tower_t));
+    sfVector2f position = {0, 0};
 
-    if (tower == NULL || check_tower_arguments == FALSE) {
+    if (tower == NULL || check_tower_arguments(data) == FALSE) {
         nfree(1, tower);
         return NULL;
     }
-    set_vector(&(*tower).position, my_getnbr(data[1]), my_getnbr(data[2]));
+    set_vector(&(*tower).position, my_getnbr(data[1]) - (TOWER_SIZE / 2.0),
+        my_getnbr(data[2]) - (TOWER_SIZE / 2.0));
     (*tower).area_radius = my_getnbr(data[3]);
     (*tower).sf_sprite = sfSprite_create();
-    if ((*tower).sf_sprite == NULL) {
+    (*tower).zone = sfCircleShape_create();
+    if ((*tower).sf_sprite == NULL || (*tower).zone) {
         free(tower);
         return NULL;
     }
+    set_vector(&position, (TOWER_SIZE / 2.0) - (*tower).area_radius,
+        (TOWER_SIZE / 2.0) - (*tower).area_radius);
+    sfCircleShape_setPosition((*tower).zone, position);
     return tower;
 }
 
@@ -112,7 +126,7 @@ static aircraft_t **get_aircraft_data(const char **script_content)
         my_replace_in_str((char *)(script_content[i]), '\t', ' ');
         splited_line = my_split_str((char *)(script_content[i]), ' ');
         if (my_strcmp(splited_line[0], "A") == 0) {
-            data[index] = aircraft_data_create((const char **)(splited_line));
+            data[index] = aircraft_create((const char **)(splited_line));
             index += 1;
         }
         if (my_strcmp(splited_line[0], "A") == 0 && data[index - 1] == NULL) {
@@ -135,7 +149,7 @@ static tower_t **get_tower_data(const char **script_content)
         my_replace_in_str((char *)(script_content[i]), '\t', ' ');
         splited_line = my_split_str((char *)(script_content[i]), ' ');
         if (my_strcmp(splited_line[0], "T") == 0) {
-            data[index] = tower_data_create((const char **)(splited_line));
+            data[index] = tower_create((const char **)(splited_line));
             index += 1;
         }
         if (my_strcmp(splited_line[0], "T") && data[index - 1] == NULL) {

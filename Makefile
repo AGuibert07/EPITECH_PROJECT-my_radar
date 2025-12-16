@@ -10,7 +10,9 @@ CC		=	epiclang
 CPPFLAGS	=	-Iinclude/
 
 SRC		=	src/main.c					\
-			src/script_data.c
+			src/script_data.c			\
+			src/collisions.c				\
+			src/render_screen.c
 
 NAME	=	'my_radar'
 
@@ -31,7 +33,7 @@ libmy_cp:
 libmy_update:	libmy_pull libmy_cp
 
 my_radar:	libmy.a	$(OBJ)
-	$(CC) $(OBJ) -l csfml-graphics -L lib -l my -o $(NAME) $(CPPFLAGS)
+	$(CC) $(OBJ) -l csfml-graphics -l csfml-system -l m -L lib -l my -o $(NAME) $(CPPFLAGS)
 
 clean:
 	cd lib/my && rm -f && cd ../../

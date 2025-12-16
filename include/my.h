@@ -24,14 +24,24 @@
     #define LOW_LETTERS "abcdefghijklmnopqrstuvwxyz"
     #define LETTERS "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
+int get_integer_part(double variable);
+
+    #define FLOAT_EUCLIDIAN_DIV(a, b) (get_integer_part(a / b))
+    #define FLOAT_MODULO(a, b) (a - (b * get_integer_part(a / b)))
+
     #define STD_IN 0
     #define STD_OUT 1
     #define STD_ERR 2
 
 enum bool {
-    TRUE,
-    FALSE
+    TRUE = (1 == 1),
+    FALSE = (1 != 1)
 } typedef bool_t;
+
+    // bool_t operators
+    #define AND(b1, b2) ((b1 == TRUE && b2 == TRUE) ? (TRUE) : (FALSE))
+    #define OR(b1, b2) ((b1 == TRUE || b2 == TRUE) ? (TRUE) : (FALSE))
+    #define NOT(b) ((b == TRUE) ? (FALSE) : (TRUE))
 
 char *convert_char_to_str(char c);
 void my_putchar(char c);
@@ -86,7 +96,6 @@ char *my_str_n_concat(unsigned int n, ...);
 char *my_char_n_concat(unsigned int n, ...);
 char **my_word_array_concat(char **arr1, char **arr2);
 char *my_int_to_str_function(int nbr, const char *base);
-int get_integer_part(double variable);
 char *my_double_to_str_function(double nbr_float, unsigned int nbr_deci);
 void my_show_int_arr(int *arr, int size);
 void my_show_two_d_int_arr(int **arr, int nbr_lines, int nbr_columns);

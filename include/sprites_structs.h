@@ -13,6 +13,7 @@
 
     #define MY_PI 3.14159265358979323846
     #define RAD_TO_DEGREE(a) ((180.0 * a) / MY_PI)
+    #define DEGREE_TO_RAD(a) ((MY_PI * a) / 180.0)
     #include "script_data.h"
 
 enum aircraft_status {
@@ -28,17 +29,20 @@ struct aircraft {
     sfVector2f position;
     double orientation;
     unsigned speed;
-    sfVector2i start_pos;
-    sfVector2i end_pos;
+    sfVector2f start_pos;
+    sfVector2f end_pos;
     sfVector2f move_vector;
     unsigned int delay;
     sfSprite *sf_sprite;
+    sfRectangleShape *box;
+    double time_start_crash;
 } typedef aircraft_t;
 
 struct tower {
     sfVector2f position;
     unsigned int area_radius;
     sfSprite *sf_sprite;
+    sfCircleShape *zone;
 } typedef tower_t;
 
 void **get_script_data_content(const char *file_name);
