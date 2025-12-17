@@ -43,7 +43,12 @@
     // frames
     #define FRAME_FREQ 25
     #define FRAME_FREQ_MAX 60
-    #define FRAME_TIME (1.0 / FRAME_FREQ)
+    #define FRAME_TIME (1000000.0 / FRAME_FREQ)
     #define TIME_TO_CRASH 1
+
+    // colors
+    #define PLANE_BOX_COLOR ((int [3]){252, 220, 119})
+    #define TOWER_AREA_COLOR ((int [3]){186, 217, 165})
+    #define TRAJECTORIES_COLOR ((int [3]){255, 255, 255})
 
 #endif /* DISPLAY_VALUES_ */

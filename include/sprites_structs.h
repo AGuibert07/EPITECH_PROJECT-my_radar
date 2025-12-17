@@ -32,10 +32,12 @@ struct aircraft {
     sfVector2f start_pos;
     sfVector2f end_pos;
     sfVector2f move_vector;
+    sfVector2f origin;
     unsigned int delay;
     sfSprite *sf_sprite;
     sfRectangleShape *box;
     double time_start_crash;
+    sfRectangleShape *trajectory;
 } typedef aircraft_t;
 
 struct tower {

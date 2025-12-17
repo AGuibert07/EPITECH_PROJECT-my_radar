@@ -32,49 +32,66 @@ static bool_t check_aircraft_arguments(const char **data)
     return TRUE;
 }
 
+static void set_origin_vector(aircraft_t *plane)
+{
+    double diag = sqrt(pow(PLANE_SIZE / 2.0, 2) * 2.0);
+    sfVector2f vector = {0, 0};
+    double angle = FLOAT_MODULO(plane->orientation - 135, 360);
+
+    if (angle < -180)
+        angle += 360;
+    angle = DEGREE_TO_RAD(angle);
+    vector.x = cos(angle) * diag;
+    vector.y = sin(angle) * diag;
+    printf("origin vector : (%.2f, %.2f) ; orientation : %.2f\n", vector.x,
+        vector.y, plane->orientation);
+    plane->origin = vector;
+}
+
 static void set_plane_values(aircraft_t *plane, unsigned int speed,
     unsigned int delay)
 {
-    sfVector2f move = {(*plane).end_pos.x - (*plane).start_pos.x,
-        (*plane).end_pos.y - (*plane).start_pos.y};
-    double rad_angle = atan2f(move.y, move.x);
-    double degree_angle = RAD_TO_DEGREE(rad_angle);
-    double move_norm = sqrt((move.x * move.x) + (move.y * move.y));
-    double factor = (1.0 * (*plane).speed) / move_norm;
-    sfVector2f origin = {(1.0 * PLANE_SIZE) / 2, (1.0 * PLANE_SIZE) / 2};
+    sfVector2f move = {plane->end_pos.x - plane->start_pos.x,
+        plane->end_pos.y - plane->start_pos.y};
+    double move_norm = sqrt(pow(move.x, 2) + pow(move.y, 2));
+    double factor = 0.0;
 
-    (*plane).status = NOT_STARTED;
-    (*plane).orientation = degree_angle;
-    (*plane).move_vector.x = move.x * factor;
-    (*plane).move_vector.y = move.y * factor;
-    (*plane).speed = speed;
-    (*plane).delay = delay;
-    (*plane).time_start_crash = -1.0;
-    (*plane).box = sfRectangleShape_create();
-    (*plane).sf_sprite = sfSprite_create();
+    plane->speed = speed;
+    factor = plane->speed / (FRAME_FREQ * move_norm);
+    plane->status = NOT_STARTED;
+    plane->orientation = RAD_TO_DEGREE(atan2f(move.y, move.x));
+    plane->move_vector.x = move.x * factor;
+    plane->move_vector.y = move.y * factor;
+    set_origin_vector(plane);
+    plane->delay = delay;
+    plane->time_start_crash = -1.0;
+    plane->box = sfRectangleShape_create();
+    plane->sf_sprite = sfSprite_create();
+    plane->trajectory = sfRectangleShape_create();
 }
 
-static aircraft_t *aircraft_create(const char **data)
+static int aircraft_create(const char **data, aircraft_t **list,
+    int index)
 {
     int size = my_word_array_len(data);
     aircraft_t *plane = malloc(sizeof(aircraft_t));
 
     if (plane == NULL || check_aircraft_arguments(data) != TRUE) {
         nfree(1, plane);
-        return NULL;
+        return EPITECH_ECHEC;
     }
-    (*plane).status = NOT_STARTED;
-    set_vector(&(*plane).start_pos, my_getnbr(data[1]) + (PLANE_SIZE / 2.0),
-        my_getnbr(data[2]) + (PLANE_SIZE / 2.0));
-    set_vector(&(*plane).end_pos, my_getnbr(data[3]), my_getnbr(data[4]));
-    set_vector(&(*plane).position, (*plane).start_pos.x - (PLANE_SIZE / 2.0),
-        (*plane).start_pos.y - (PLANE_SIZE / 2.0));
+    set_vector(&plane->start_pos, my_getnbr(data[1]), my_getnbr(data[2]));
+    set_vector(&plane->end_pos, my_getnbr(data[3]), my_getnbr(data[4]));
+    set_vector(&plane->position, plane->start_pos.x - (PLANE_SIZE / 2.0),
+        plane->start_pos.y - (PLANE_SIZE / 2.0));
     set_plane_values(plane, my_getnbr(data[5]), my_getnbr(data[6]));
-    if ((*plane).sf_sprite == NULL || (*plane).box == NULL) {
+    if (plane->sf_sprite == NULL || plane->box == NULL ||
+        plane->trajectory == NULL) {
         free(plane);
-        return NULL;
+        return EPITECH_ECHEC;
     }
-    return plane;
+    list[index] = plane;
+    return EPITECH_SUCCESS;
 }
 
 static bool_t check_tower_arguments(const char **data)
@@ -90,7 +107,16 @@ static bool_t check_tower_arguments(const char **data)
     return TRUE;
 }
 
-static tower_t *tower_create(const char **data)
+static void set_tower_values(tower_t *tower, double pos_x, double pos_y,
+    unsigned int area_radius)
+{
+    set_vector(&(*tower).position, pos_x, pos_y);
+    (*tower).area_radius = area_radius;
+    (*tower).sf_sprite = sfSprite_create();
+    (*tower).zone = sfCircleShape_create();
+}
+
+static int tower_create(const char **data, tower_t **list, int index)
 {
     int size = my_word_array_len(data);
     tower_t *tower = malloc(sizeof(tower_t));
@@ -98,21 +124,20 @@ static tower_t *tower_create(const char **data)
 
     if (tower == NULL || check_tower_arguments(data) == FALSE) {
         nfree(1, tower);
-        return NULL;
+        return EPITECH_ECHEC;
     }
-    set_vector(&(*tower).position, my_getnbr(data[1]) - (TOWER_SIZE / 2.0),
-        my_getnbr(data[2]) - (TOWER_SIZE / 2.0));
+    set_tower_values(tower, my_getnbr(data[1]) - (TOWER_SIZE / 2.0),
+        my_getnbr(data[2]) - (TOWER_SIZE / 2.0), my_getnbr(data[3]));
     (*tower).area_radius = my_getnbr(data[3]);
-    (*tower).sf_sprite = sfSprite_create();
-    (*tower).zone = sfCircleShape_create();
-    if ((*tower).sf_sprite == NULL || (*tower).zone) {
+    if ((*tower).sf_sprite == NULL || (*tower).zone == NULL) {
         free(tower);
-        return NULL;
+        return EPITECH_ECHEC;
     }
     set_vector(&position, (TOWER_SIZE / 2.0) - (*tower).area_radius,
         (TOWER_SIZE / 2.0) - (*tower).area_radius);
     sfCircleShape_setPosition((*tower).zone, position);
-    return tower;
+    list[index] = tower;
+    return EPITECH_SUCCESS;
 }
 
 static aircraft_t **get_aircraft_data(const char **script_content)
@@ -121,15 +146,16 @@ static aircraft_t **get_aircraft_data(const char **script_content)
     aircraft_t **data = malloc(sizeof(aircraft_t *) * (size + 1));
     int index = 0;
     char **splited_line = NULL;
+    int verif = 0;
 
     for (int i = 0; i < size; ++i) {
         my_replace_in_str((char *)(script_content[i]), '\t', ' ');
         splited_line = my_split_str((char *)(script_content[i]), ' ');
         if (my_strcmp(splited_line[0], "A") == 0) {
-            data[index] = aircraft_create((const char **)(splited_line));
+            verif = aircraft_create((const char **)(splited_line), data, index);
             index += 1;
         }
-        if (my_strcmp(splited_line[0], "A") == 0 && data[index - 1] == NULL) {
+        if (verif == EPITECH_ECHEC) {
             free_array((void **)(data), 2);
             return NULL;
         }
@@ -144,18 +170,19 @@ static tower_t **get_tower_data(const char **script_content)
     tower_t **data = malloc(sizeof(tower_t *) * (size + 1));
     int index = 0;
     char **splited_line = NULL;
+    int verif = 0;
 
+    if (data == NULL)
+        return NULL;
     for (int i = 0; i < size; ++i) {
         my_replace_in_str((char *)(script_content[i]), '\t', ' ');
         splited_line = my_split_str((char *)(script_content[i]), ' ');
         if (my_strcmp(splited_line[0], "T") == 0) {
-            data[index] = tower_create((const char **)(splited_line));
+            verif = tower_create((const char **)(splited_line), data, index);
             index += 1;
         }
-        if (my_strcmp(splited_line[0], "T") && data[index - 1] == NULL) {
-            free_array((void **)(data), 2);
+        if (verif == EPITECH_ECHEC)
             return NULL;
-        }
     }
     data[index] = NULL;
     return data;
