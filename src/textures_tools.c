@@ -108,22 +108,44 @@ static bool_t is_null_element(textures_versions_t *textures)
     return FALSE;
 }
 
+static element_textures_t *set_colors(element_textures_t *bg_textures)
+{
+    int *bg_colors[6] = {BC1, BC2, BC3, BC4, BC5, BC6};
+    int *plane_col[6] = {P_RED, P_RED, P_YELLOW, P_YELLOW, P_YELLOW, P_YELLOW};
+    int *tower_col[6] = {CT_GREEN, CT_GREEN, CT_GREEN, CT_GREEN, CT_GREEN,
+        CT_GREEN};
+    int *traj_col[6] = {T_BLACK, T_DARK_GRAY, T_WHITE, T_DARK_GRAY,
+        T_DARK_GRAY, T_DARK_GRAY};
+
+    for (int i = 0; i < bg_textures->versions_nbr; ++i) {
+        bg_textures->textures[i].colors.background_color =
+            sfColor_fromRGB(bg_colors[i][0], bg_colors[i][1], bg_colors[i][2]);
+        bg_textures->textures[i].colors.plane_boxes_color =
+            sfColor_fromRGB(plane_col[i][0], plane_col[i][1], plane_col[i][2]);
+        bg_textures->textures[i].colors.tower_zones_color =
+            sfColor_fromRGB(tower_col[i][0], tower_col[i][1], tower_col[i][2]);
+        bg_textures->textures[i].colors.trajectories_color =
+            sfColor_fromRGB(traj_col[i][0], traj_col[i][1], traj_col[i][2]);
+    }
+    return bg_textures;
+}
+
 textures_versions_t *get_textures(void)
 {
     textures_versions_t *textures = malloc(sizeof(textures_versions_t));
     const int *planes_sizes[2] = {_PLANES_WIDTHS_, _PLANES_HEIGHTS_};
     const int *towers_sizes[2] = {_TOWERS_WIDTHS_, _TOWERS_HEIGHTS_};
-    const int *backgrounds_sizes[2] = {(const int *)(_BACKGROUNDS_WIDTHS_),
+    const int *bg_sizes[2] = {(const int *)(_BACKGROUNDS_WIDTHS_),
         (const int *)(_BACKGROUNDS_HEIGHTS_)};
 
     if (textures == NULL)
         return NULL;
     textures->plane_textures = get_textures_for_sprite(_PLANES_NBR_, _PLANE_ID_
-        - 2, (char **)(_PLANES_PATHS_), (const int **)(planes_sizes));
+        - 2, (char **)(_PLANES_PATHS_), planes_sizes);
     textures->tower_textures = get_textures_for_sprite(_TOWERS_NBR_, _TOWER_ID_
-        - 2, (char **)(_TOWERS_PATHS_), (const int **)(towers_sizes));
-    textures->bg_textures = get_textures_for_sprite(_BG_NBR_, _BACKGROUND_ID_ -
-        2, (char **)(_BACKGROUNDS_PATHS_), backgrounds_sizes);
+        - 2, (char **)(_TOWERS_PATHS_), towers_sizes);
+    textures->bg_textures = set_colors(get_textures_for_sprite(_BG_NBR_,
+            _BACKGROUND_ID_ - 2, (char **)(_BACKGROUNDS_PATHS_), bg_sizes));
     textures->crash_textures = get_crash_textures();
     if (is_null_element(textures) == TRUE) {
         textures_versions_destroy(textures);

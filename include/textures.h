@@ -12,11 +12,21 @@
     #include "my.h"
     #include "sprites_structs.h"
 
+
+struct elements_colors {
+    sfColor background_color;
+    sfColor plane_boxes_color;
+    sfColor tower_zones_color;
+    sfColor trajectories_color;
+} typedef elements_colors_t;
+
 struct texture {
     char *file_name;
     unsigned int file_width;
     unsigned int file_height;
     sfTexture *sf_texture;
+    elements_colors_t colors;
+
 } typedef texture_t;
 
 struct element_textures {
@@ -32,11 +42,10 @@ struct textures_versions {
     element_textures_t *bg_textures;
 } typedef textures_versions_t;
 
-
 // functions from the get_textures_and_sprites.c source file
 void update_background_texture(sfSprite *background,
-    textures_versions_t *textures);
-sfSprite *get_background(textures_versions_t *textures);
+    textures_versions_t *textures, void **script_data);
+sfSprite *get_background(textures_versions_t *textures, void **script_data);
 void update_plane_texture(aircraft_t **planes, textures_versions_t *textures);
 void update_tower_texture(tower_t **towers, textures_versions_t *textures);
 bool_t set_textures_and_pos(aircraft_t **planes, tower_t **towers,

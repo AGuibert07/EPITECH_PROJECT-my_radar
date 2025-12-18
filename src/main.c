@@ -44,7 +44,7 @@ static int radar_launch(void **script_data, textures_versions_t *textures)
     sfSprite *background = NULL;
     int r_val = 0;
 
-    background = get_background(textures);
+    background = get_background(textures, script_data);
     if (background == NULL)
         return EPITECH_ECHEC;
     r_val = render_radar(window, background, script_data, textures);

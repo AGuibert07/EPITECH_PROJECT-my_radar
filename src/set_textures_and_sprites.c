@@ -12,8 +12,26 @@
 #include "sprites_structs.h"
 #include "textures.h"
 
-void update_background_texture(sfSprite *background,
+static void update_elements_colors(aircraft_t **planes, tower_t **towers,
     textures_versions_t *textures)
+{
+    for (int i = 0; planes[i] != NULL; ++i) {
+        sfRectangleShape_setOutlineColor(planes[i]->box, textures->bg_textures
+            ->textures[textures->bg_textures->version_id].colors.
+            plane_boxes_color);
+        sfRectangleShape_setOutlineColor(planes[i]->trajectory, textures->
+            bg_textures->textures[textures->bg_textures->version_id].colors.
+            trajectories_color);
+    }
+    for (int i = 0; towers[i] != NULL; ++i) {
+        sfCircleShape_setOutlineColor(towers[i]->zone, textures->bg_textures->
+            textures[textures->bg_textures->version_id].colors.
+            tower_zones_color);
+    }
+}
+
+void update_background_texture(sfSprite *background,
+    textures_versions_t *textures, void **script_data)
 {
     sfVector2f vector = {1, 1};
     double bg_scale_factor = 0.0;
@@ -33,26 +51,25 @@ void update_background_texture(sfSprite *background,
     vector.x = (SCREEN_WIDTH - (t.file_width * bg_scale_factor)) / 2.0;
     vector.y = (SCREEN_HEIGHT - (t.file_height * bg_scale_factor)) / 2.0;
     sfSprite_setPosition(background, vector);
+    update_elements_colors(script_data[0], script_data[1], textures);
 }
 
-sfSprite *get_background(textures_versions_t *textures)
+sfSprite *get_background(textures_versions_t *textures, void **script_data)
 {
     sfSprite *sprite = sfSprite_create();
 
     if (sprite == NULL)
         return NULL;
-    update_background_texture(sprite, textures);
+    update_background_texture(sprite, textures, script_data);
     return sprite;
 }
 
-static bool_t set_planes_trajectories(aircraft_t **planes)
+static bool_t set_planes_trajectories(aircraft_t **planes,
+    textures_versions_t *textures)
 {
-    sfColor color = sfColor_fromRGB(TRAJECTORIES_COLOR[0],
-        TRAJECTORIES_COLOR[1], TRAJECTORIES_COLOR[2]);
     sfVector2f vector = {0, 0};
 
     for (int i = 0; planes[i] != NULL; ++i) {
-        sfRectangleShape_setOutlineColor(planes[i]->trajectory, color);
         sfRectangleShape_setFillColor(planes[i]->trajectory, sfTransparent);
         sfRectangleShape_setOutlineThickness(planes[i]->trajectory,
             BOX_LINE_SIZE / 2.0);
@@ -69,7 +86,8 @@ static bool_t set_planes_trajectories(aircraft_t **planes)
     return TRUE;
 }
 
-static bool_t set_sprites_positions(aircraft_t **planes, tower_t **towers)
+static bool_t set_sprites_positions(aircraft_t **planes, tower_t **towers,
+    textures_versions_t *textures)
 {
     sfVector2f position = {0, 0};
 
@@ -90,31 +108,26 @@ static bool_t set_sprites_positions(aircraft_t **planes, tower_t **towers)
         position.y = towers[i]->position.y - towers[i]->area_radius;
         sfCircleShape_setPosition(towers[i]->zone, position);
     }
-    return set_planes_trajectories(planes);
+    return set_planes_trajectories(planes, textures);
 }
 
-static bool_t set_sprites_boxes(aircraft_t **planes, tower_t **towers)
+static bool_t set_sprites_boxes(aircraft_t **planes, tower_t **towers,
+    textures_versions_t *textures)
 {
     sfVector2f size = {PLANE_BOX_SIZE, PLANE_BOX_SIZE};
-    sfColor plane_box_color = sfColor_fromRGB(PLANE_BOX_COLOR[0],
-        PLANE_BOX_COLOR[1], PLANE_BOX_COLOR[2]);
-    sfColor tower_box_color = sfColor_fromRGB(TOWER_AREA_COLOR[0],
-        TOWER_AREA_COLOR[1], TOWER_AREA_COLOR[2]);
 
     for (int i = 0; planes[i] != NULL; ++i) {
         sfRectangleShape_setSize(planes[i]->box, size);
         sfRectangleShape_setRotation(planes[i]->box, planes[i]->orientation);
-        sfRectangleShape_setOutlineColor(planes[i]->box, plane_box_color);
         sfRectangleShape_setOutlineThickness(planes[i]->box, BOX_LINE_SIZE);
         sfRectangleShape_setFillColor(planes[i]->box, sfTransparent);
     }
     for (int i = 0; towers[i] != NULL; ++i) {
         sfCircleShape_setRadius(towers[i]->zone, towers[i]->area_radius);
-        sfCircleShape_setOutlineColor(towers[i]->zone, tower_box_color);
         sfCircleShape_setOutlineThickness(towers[i]->zone, BOX_LINE_SIZE);
         sfCircleShape_setFillColor(towers[i]->zone, sfTransparent);
     }
-    return set_sprites_positions(planes, towers);
+    return set_sprites_positions(planes, towers, textures);
 }
 
 static double get_scale_factor(unsigned int size, element_textures_t *textures)
@@ -165,5 +178,5 @@ bool_t set_textures_and_pos(aircraft_t **planes, tower_t **towers,
         sfSprite_setRotation(planes[i]->sf_sprite, planes[i]->orientation);
     }
     update_tower_texture(towers, textures);
-    return set_sprites_boxes(planes, towers);
+    return set_sprites_boxes(planes, towers, textures);
 }

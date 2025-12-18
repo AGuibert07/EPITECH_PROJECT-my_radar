@@ -36,7 +36,6 @@ struct aircraft {
     unsigned int delay;
     sfSprite *sf_sprite;
     sfRectangleShape *box;
-    double time_start_crash;
     int crash_frame_index;
     sfRectangleShape *trajectory;
 } typedef aircraft_t;

@@ -61,7 +61,6 @@ static void set_plane_values(aircraft_t *plane, unsigned int speed,
     plane->move_vector.y = move.y * factor;
     set_origin_vector(plane);
     plane->delay = delay;
-    plane->time_start_crash = -1.0;
     plane->box = sfRectangleShape_create();
     plane->sf_sprite = sfSprite_create();
     plane->trajectory = sfRectangleShape_create();

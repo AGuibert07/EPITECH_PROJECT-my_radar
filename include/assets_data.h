@@ -10,13 +10,24 @@
 
     #include <SFML/Graphics.h>
 
-    // backgrounds colors
+    // colors
+    //      backgrounds colors
     #define BC1 ((int [3]){182, 220, 244})
     #define BC2 ((int [3]){218, 240, 253})
     #define BC3 ((int[3]){0, 3, 6})
     #define BC4 ((int[3]){176, 175, 181})
     #define BC5 ((int[3]){255, 255, 255})
     #define BC6 ((int[3]){248, 248, 248})
+    //      trajectories colors
+    #define T_WHITE ((int [3]){255, 255, 255})
+    #define T_BLACK ((int [3]){0, 0, 0})
+    #define T_LIGHT_GRAY ((int [3]){240, 240, 240})
+    #define T_DARK_GRAY ((int [3]){100, 100, 100})
+    //      planes boxes colors
+    #define P_YELLOW ((int [3]){252, 220, 119})
+    #define P_RED ((int [3]){239, 82, 82})
+    //      towers areas colors
+    #define CT_GREEN ((int [3]){186, 217, 165})
 
     // backgrounds
     //      backgrounds paths

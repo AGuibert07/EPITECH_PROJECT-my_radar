@@ -42,7 +42,8 @@ static void c_touch(event_arguments_t *arguments)
 
 static void b_touch(event_arguments_t *arguments)
 {
-    update_background_texture(arguments->background, arguments->textures);
+    update_background_texture(arguments->background, arguments->textures,
+        arguments->script_data);
 }
 
 static int get_keyboard_events(sfEvent *event, sfRenderWindow *window,
@@ -55,7 +56,7 @@ static int get_keyboard_events(sfEvent *event, sfRenderWindow *window,
     key_touch_t *elt = NULL;
 
     if (event->key.code == sfKeyEscape || event->key.code == sfKeyQ) {
-        sfRenderWindow_destroy(window);
+        sfRenderWindow_close(window);
         return EPITECH_SUCCESS;
     }
     for (int i = 0; i < (NBR_TOUCH_EVENTS - 1); ++i) {
