@@ -27,6 +27,8 @@ static int get_keyboard_events(sfEvent *event, sfRenderWindow *window,
         update_tower_texture(arguments->script_data[1], arguments->textures);
     if (event->key.code == sfKeyB)
         update_background_texture(arguments->background, arguments->textures);
+    if (event->key.code == sfKeyA)
+        arguments->show_crash = NOT(arguments->show_crash);
     return EPITECH_SUCCESS;
 }
 

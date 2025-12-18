@@ -14,6 +14,7 @@
 #include "render_screen.h"
 #include "textures.h"
 #include "events_traitment.h"
+#include "collisions.h"
 
 static bool_t is_aircraft_arrived(aircraft_t *plane)
 {
@@ -54,13 +55,13 @@ static void update_planes_display(aircraft_t **planes, sfClock *timer)
     }
 }
 
-static void check_crash_time(aircraft_t *plane, sfClock *timer)
+/*static void check_crash_time(aircraft_t *plane, sfClock *timer)
 {
     if (MICRO_SEC_TO_SEC(sfClock_getElapsedTime(timer).microseconds -
             (*plane).time_start_crash) >= TIME_TO_CRASH)
         (*plane).status = CRASHED;
 }
-
+*/
 /*static void render_towers(sfRenderWindow *window, tower_t **towers,
     bool_t *bool_options)
 {
@@ -72,9 +73,30 @@ static void check_crash_time(aircraft_t *plane, sfClock *timer)
 }
 */
 static void render_plane(sfRenderWindow *window, aircraft_t *plane,
+    event_arguments_t *event_arguments, textures_versions_t *textures)
+{
+    if (plane->status == CRASHING) {
+        if (plane->crash_frame_index + 1 >=
+            textures->crash_textures->versions_nbr) {
+            plane->status = CRASHED;
+            return;
+        }
+        update_crash_texture(plane, textures->crash_textures);
+    }
+    if (event_arguments->show_trajectories && plane->status == FLYING)
+        sfRenderWindow_drawRectangleShape(window, plane->trajectory, NULL);
+    if (event_arguments->show_boxes && plane->status == FLYING)
+        sfRenderWindow_drawRectangleShape(window, plane->box, NULL);
+    if (event_arguments->show_sprites)
+        sfRenderWindow_drawSprite(window, plane->sf_sprite, NULL);
+}
+
+/*static void render_plane(sfRenderWindow *window, aircraft_t *plane,
     event_arguments_t *event_arguments, sfClock *timer)
 {
-    if (plane->status == CRASHING)
+    if (plane->status == CRASHING) {
+        update_crash_texture(plane, )
+    }
         check_crash_time(plane, timer);
     if (event_arguments->show_trajectories)
         sfRenderWindow_drawRectangleShape(window, plane->trajectory, NULL);
@@ -83,9 +105,11 @@ static void render_plane(sfRenderWindow *window, aircraft_t *plane,
     if (event_arguments->show_sprites)
         sfRenderWindow_drawSprite(window, plane->sf_sprite, NULL);
 }
-
+*/
+// static void render_sprites(sfRenderWindow *window, void **script_data,
+//     event_arguments_t *event_arguments, sfClock *timer)
 static void render_sprites(sfRenderWindow *window, void **script_data,
-    event_arguments_t *event_arguments, sfClock *timer)
+    event_arguments_t *event_arguments, textures_versions_t *textures)
 {
     aircraft_t **planes = script_data[0];
     tower_t **towers = script_data[1];
@@ -97,8 +121,10 @@ static void render_sprites(sfRenderWindow *window, void **script_data,
             sfRenderWindow_drawSprite(window, towers[i]->sf_sprite, NULL);
     }
     for (int i = 0; planes[i] != NULL; ++i) {
-        if (planes[i]->status == FLYING || planes[i]->status == CRASHING)
-            render_plane(window, planes[i], event_arguments, timer);
+        if (planes[i]->status == FLYING || (planes[i]->status == CRASHING &&
+            event_arguments->show_crash))
+            render_plane(window, planes[i], event_arguments, textures);
+            // render_plane(window, planes[i], event_arguments, timer);
     }
 }
 
@@ -108,7 +134,9 @@ static void refresh_screen(void **script_data, textures_versions_t *textures,
     if (sfClock_getElapsedTime(frame_timer).microseconds >= FRAME_TIME) {
         update_planes_display(script_data[0], timer);
         check_collisions(script_data[0], script_data[1],
-            textures->crash_textures->textures[0].sf_texture, timer);
+            textures->crash_textures);
+        // check_collisions(script_data[0], script_data[1],
+        //     textures->crash_textures->textures[0].sf_texture, timer);
         sfClock_restart(frame_timer);
     }
 }
@@ -126,7 +154,7 @@ int render_radar(sfRenderWindow *window, sfSprite *background,
     sfColor bg_color = sfColor_fromRGB(BACKGROUND_COLOR[0], BACKGROUND_COLOR[1],
         BACKGROUND_COLOR[2]);
     sfClock *timers[2] = {sfClock_create(), sfClock_create()};
-    event_arguments_t arguments = {TRUE, TRUE, FALSE, script_data, textures,
+    event_arguments_t arguments = {TRUE, TRUE, FALSE, TRUE, script_data, textures,
         background};
 
     if (timers[0] == NULL || timers[1] == NULL)
@@ -136,7 +164,8 @@ int render_radar(sfRenderWindow *window, sfSprite *background,
         sfRenderWindow_clear(window, bg_color);
         sfRenderWindow_drawSprite(window, background, NULL);
         refresh_screen(script_data, textures, timers[0], timers[1]);
-        render_sprites(window, script_data, &arguments, timers[0]);
+        render_sprites(window, script_data, &arguments, textures);
+        // render_sprites(window, script_data, &arguments, timers[0]);
         sfRenderWindow_display(window);
         if (get_events(window, &arguments) != EPITECH_SUCCESS)
             return destroy_clocks_and_return(timers, EPITECH_ECHEC);

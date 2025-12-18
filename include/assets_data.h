@@ -68,6 +68,7 @@
     #define _FRAME_WIDTH_ 110
     #define _FRAME_HEIGHT_ 105
     #define _FRAME_COORDS_ ((int *[_F_NBR_]){F1, F2, F3, F4, F5, F6, F7, F8})
+    #define _FRAME_PLANE_PART_SIZE_ 20.0
 
     // selection
     //      versions number

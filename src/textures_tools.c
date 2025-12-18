@@ -131,3 +131,26 @@ textures_versions_t *get_textures(void)
     }
     return textures;
 }
+
+void set_crash_texture(aircraft_t *plane, element_textures_t *textures)
+{
+    double factor = ((1.0 * CRASH_SIZE) / FRAME_WIDTH);
+    sfVector2f vector = {factor, factor};
+
+    sfSprite_setTexture(plane->sf_sprite, textures->textures[0].sf_texture,
+        sfTrue);
+    sfSprite_setScale(plane->sf_sprite, vector);
+    plane->origin.x = -(FRAME_WIDTH * factor) / 2;
+    plane->origin.y = -(FRAME_HEIGHT * factor) / 2;
+    vector.x = plane->position.x + plane->origin.x;
+    vector.y = plane->position.y + plane->origin.y;
+    sfSprite_setPosition(plane->sf_sprite, vector);
+    plane->crash_frame_index = 0;
+}
+
+void update_crash_texture(aircraft_t *plane, element_textures_t *textures)
+{
+    plane->crash_frame_index += 1;
+    sfSprite_setTexture(plane->sf_sprite, textures->textures[
+            plane->crash_frame_index].sf_texture, sfTrue);
+}

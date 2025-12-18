@@ -58,5 +58,6 @@
     #define FRAME_HEIGHT (_FRAME_HEIGHT_)
     #define CRASH_FILE_NAME "assets/sprites/crash-1.png"
     #define FRAMES_AREAS_COORDS (_FRAME_COORDS_)
+    #define CRASH_SIZE ((PLANE_SIZE * FRAME_WIDTH) / _FRAME_PLANE_PART_SIZE_)
 
 #endif /* DISPLAY_VALUES_ */

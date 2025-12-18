@@ -16,6 +16,7 @@ struct event_arguments
     bool_t show_sprites;
     bool_t show_boxes;
     bool_t show_trajectories;
+    bool_t show_crash;
     void **script_data;
     textures_versions_t *textures;
     sfSprite *background;

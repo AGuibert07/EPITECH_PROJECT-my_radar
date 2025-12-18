@@ -65,6 +65,7 @@ static void set_plane_values(aircraft_t *plane, unsigned int speed,
     plane->box = sfRectangleShape_create();
     plane->sf_sprite = sfSprite_create();
     plane->trajectory = sfRectangleShape_create();
+    plane->crash_frame_index = -1;
 }
 
 static int aircraft_create(const char **data, aircraft_t **list,

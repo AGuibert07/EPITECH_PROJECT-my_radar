@@ -64,6 +64,7 @@ static void print_help(void)
     my_putstr("  'L' key        enable/disable hitboxes and areas.\n");
     my_putstr("  'S' key        enable/disable sprites.\n");
     my_putstr("  'T' key        enable/disable planes trajectories.\n");
+    my_putstr("  'A' key        enable/disable crash animation\n");
     my_putstr("  'B' key        switch the background image\n");
     my_putstr("  'P' key        switch the planes image\n");
     my_putstr("  'C' key        switch the control towers image\n");

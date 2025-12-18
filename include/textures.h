@@ -41,10 +41,12 @@ void update_plane_texture(aircraft_t **planes, textures_versions_t *textures);
 void update_tower_texture(tower_t **towers, textures_versions_t *textures);
 bool_t set_textures_and_pos(aircraft_t **planes, tower_t **towers,
     textures_versions_t *textures);
-// bool_t set_textures_and_pos(aircraft_t **planes, tower_t **towers);
 
 //functions from the textures_tools.c source file
 void textures_versions_destroy(textures_versions_t *textures);
 textures_versions_t *get_textures(void);
+void set_crash_texture(aircraft_t *plane, element_textures_t *textures);
+void update_crash_texture(aircraft_t *plane, element_textures_t *textures);
+// bool_t set_textures_and_pos(aircraft_t **planes, tower_t **towers);
 
 #endif /* TEXTURES_ */
