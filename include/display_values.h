@@ -39,6 +39,7 @@
     #define PLANE_SCALE ((1.0 * PLANE_SIZE) / PLANE_WIDTH)
     #define TOWER_SCALE ((1.0 * TOWER_SIZE) / TOWER_WIDTH)
     #define BOX_LINE_SIZE 4
+    #define NBR_VERSIONS ((int [3]){_PLANES_NBR_, _TOWERS_NBR_, _BG_NBR_})
 
     // frames
     #define FRAME_FREQ 25
@@ -50,5 +51,12 @@
     #define PLANE_BOX_COLOR ((int [3]){252, 220, 119})
     #define TOWER_AREA_COLOR ((int [3]){186, 217, 165})
     #define TRAJECTORIES_COLOR ((int [3]){255, 255, 255})
+
+    // crash animation
+    #define CRASH_FRAME_NBR (_F_NBR_)
+    #define FRAME_WIDTH (_FRAME_WIDTH_)
+    #define FRAME_HEIGHT (_FRAME_HEIGHT_)
+    #define CRASH_FILE_NAME "assets/sprites/crash-1.png"
+    #define FRAMES_AREAS_COORDS (_FRAME_COORDS_)
 
 #endif /* DISPLAY_VALUES_ */

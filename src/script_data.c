@@ -19,11 +19,12 @@ static void set_vector(sfVector2f *vector, int x_val, int y_val)
     (*vector).y = y_val;
 }
 
-static bool_t check_aircraft_arguments(const char **data)
+static bool_t check_script_arguments(const char **data,
+    const unsigned int correct_arg_nbr)
 {
     int size = my_word_array_len(data);
 
-    if (size != 7)
+    if (size != correct_arg_nbr)
         return FALSE;
     for (int i = 1; i < size; ++i) {
         if (my_str_isnum(data[i]) != 0)
@@ -35,17 +36,13 @@ static bool_t check_aircraft_arguments(const char **data)
 static void set_origin_vector(aircraft_t *plane)
 {
     double diag = sqrt(pow(PLANE_SIZE / 2.0, 2) * 2.0);
-    sfVector2f vector = {0, 0};
     double angle = FLOAT_MODULO(plane->orientation - 135, 360);
 
     if (angle < -180)
         angle += 360;
     angle = DEGREE_TO_RAD(angle);
-    vector.x = cos(angle) * diag;
-    vector.y = sin(angle) * diag;
-    printf("origin vector : (%.2f, %.2f) ; orientation : %.2f\n", vector.x,
-        vector.y, plane->orientation);
-    plane->origin = vector;
+    plane->origin.x = cos(angle) * diag;
+    plane->origin.y = sin(angle) * diag;
 }
 
 static void set_plane_values(aircraft_t *plane, unsigned int speed,
@@ -76,14 +73,13 @@ static int aircraft_create(const char **data, aircraft_t **list,
     int size = my_word_array_len(data);
     aircraft_t *plane = malloc(sizeof(aircraft_t));
 
-    if (plane == NULL || check_aircraft_arguments(data) != TRUE) {
+    if (plane == NULL || check_script_arguments(data, 7) != TRUE) {
         nfree(1, plane);
         return EPITECH_ECHEC;
     }
     set_vector(&plane->start_pos, my_getnbr(data[1]), my_getnbr(data[2]));
     set_vector(&plane->end_pos, my_getnbr(data[3]), my_getnbr(data[4]));
-    set_vector(&plane->position, plane->start_pos.x - (PLANE_SIZE / 2.0),
-        plane->start_pos.y - (PLANE_SIZE / 2.0));
+    set_vector(&plane->position, plane->start_pos.x, plane->start_pos.y);
     set_plane_values(plane, my_getnbr(data[5]), my_getnbr(data[6]));
     if (plane->sf_sprite == NULL || plane->box == NULL ||
         plane->trajectory == NULL) {
@@ -94,26 +90,16 @@ static int aircraft_create(const char **data, aircraft_t **list,
     return EPITECH_SUCCESS;
 }
 
-static bool_t check_tower_arguments(const char **data)
-{
-    int size = my_word_array_len(data);
-
-    if (size != 4)
-        return FALSE;
-    for (int i = 1; i < size; ++i) {
-        if (my_str_isnum(data[i]) != 0)
-            return FALSE;
-    }
-    return TRUE;
-}
-
 static void set_tower_values(tower_t *tower, double pos_x, double pos_y,
     unsigned int area_radius)
 {
-    set_vector(&(*tower).position, pos_x, pos_y);
-    (*tower).area_radius = area_radius;
-    (*tower).sf_sprite = sfSprite_create();
-    (*tower).zone = sfCircleShape_create();
+    tower->position.x = pos_x;
+    tower->position.y = pos_y;
+    tower->area_radius = area_radius;
+    tower->sf_sprite = sfSprite_create();
+    tower->zone = sfCircleShape_create();
+    tower->origin.x = -TOWER_SIZE / 2.0;
+    tower->origin.y = 0;
 }
 
 static int tower_create(const char **data, tower_t **list, int index)
@@ -122,12 +108,12 @@ static int tower_create(const char **data, tower_t **list, int index)
     tower_t *tower = malloc(sizeof(tower_t));
     sfVector2f position = {0, 0};
 
-    if (tower == NULL || check_tower_arguments(data) == FALSE) {
+    if (tower == NULL || check_script_arguments(data, 4) == FALSE) {
         nfree(1, tower);
         return EPITECH_ECHEC;
     }
-    set_tower_values(tower, my_getnbr(data[1]) - (TOWER_SIZE / 2.0),
-        my_getnbr(data[2]) - (TOWER_SIZE / 2.0), my_getnbr(data[3]));
+    set_tower_values(tower, my_getnbr(data[1]), my_getnbr(data[2]),
+        my_getnbr(data[3]));
     (*tower).area_radius = my_getnbr(data[3]);
     if ((*tower).sf_sprite == NULL || (*tower).zone == NULL) {
         free(tower);

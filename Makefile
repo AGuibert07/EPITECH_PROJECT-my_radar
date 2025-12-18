@@ -9,10 +9,13 @@ CC		=	epiclang
 
 CPPFLAGS	=	-Iinclude/
 
-SRC		=	src/main.c					\
-			src/script_data.c			\
+SRC		=	src/main.c						\
+			src/script_data.c				\
 			src/collisions.c				\
-			src/render_screen.c
+			src/render_screen.c				\
+			src/events_traitment.c			\
+			src/set_textures_and_sprites.c	\
+			src/textures_tools.c
 
 NAME	=	'my_radar'
 

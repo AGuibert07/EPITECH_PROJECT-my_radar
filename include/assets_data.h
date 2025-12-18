@@ -53,9 +53,25 @@
     #define _TOWERS_WIDTHS_ ((int [2]){512, 35})
     #define _TOWERS_HEIGHTS_ ((int [2]){512, 46})
 
+    //      crash
+    //          frames areas top left corner position in image file
+    #define F1 ((int [2]){8, 23})
+    #define F2 ((int [2]){120, 25})
+    #define F3 ((int [2]){225, 27})
+    #define F4 ((int [2]){336, 22})
+    #define F5 ((int [2]){15, 119})
+    #define F6 ((int [2]){124, 118})
+    #define F7 ((int [2]){225, 124})
+    #define F8 ((int [2]){336, 127})
+
+    #define _F_NBR_ 8
+    #define _FRAME_WIDTH_ 110
+    #define _FRAME_HEIGHT_ 105
+    #define _FRAME_COORDS_ ((int *[_F_NBR_]){F1, F2, F3, F4, F5, F6, F7, F8})
+
     // selection
     //      versions number
-    #define _BACKGROUNDS_NBR_ 6
+    #define _BG_NBR_ 6
     #define _PLANES_NBR_ 1
     #define _TOWERS_NBR_ 2
     #define _CRASHS_NBR_ 1

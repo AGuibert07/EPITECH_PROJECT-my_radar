@@ -42,6 +42,7 @@ struct aircraft {
 
 struct tower {
     sfVector2f position;
+    sfVector2f origin;
     unsigned int area_radius;
     sfSprite *sf_sprite;
     sfCircleShape *zone;

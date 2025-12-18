@@ -12,160 +12,17 @@
 #include "sprites_structs.h"
 #include "display_values.h"
 #include "render_screen.h"
+#include "textures.h"
+#include "arguments.h"
 
-static sfSprite *get_background(sfTexture *texture)
-{
-    sfSprite *sprite = sfSprite_create();
-    sfVector2f scale_bg = {1, 1};
-    double bg_scale_factor = 0;
-    sfVector2f position = {1, 1};
-
-    if (sprite == NULL)
-        return NULL;
-    if (((1.0 * BACKGROUND_WIDTH) / BACKGROUND_HEIGHT) >= SCREEN_RATIO)
-        bg_scale_factor = (1.0 * SCREEN_WIDTH) / BACKGROUND_WIDTH;
-    else
-        bg_scale_factor = (1.0 * SCREEN_HEIGHT) / BACKGROUND_HEIGHT;
-    scale_bg.x = bg_scale_factor;
-    scale_bg.y = bg_scale_factor;
-    sfSprite_setTexture(sprite, texture, sfFalse);
-    sfSprite_setScale(sprite, scale_bg);
-    position.x = (SCREEN_WIDTH - (BACKGROUND_WIDTH * bg_scale_factor)) / 2.0;
-    position.y = (SCREEN_HEIGHT - (BACKGROUND_HEIGHT * bg_scale_factor)) / 2.0;
-    sfSprite_setPosition(sprite, position);
-    return sprite;
-}
-
-static bool_t set_planes_trajectories(aircraft_t **planes)
-{
-    sfColor color = sfColor_fromRGB(TRAJECTORIES_COLOR[0],
-        TRAJECTORIES_COLOR[1], TRAJECTORIES_COLOR[2]);
-    sfVector2f vector = {0, 0};
-
-    for (int i = 0; planes[i] != NULL; ++i) {
-        sfRectangleShape_setOutlineColor(planes[i]->trajectory, color);
-        sfRectangleShape_setFillColor(planes[i]->trajectory, sfTransparent);
-        sfRectangleShape_setOutlineThickness(planes[i]->trajectory,
-            BOX_LINE_SIZE / 2.0);
-        vector.x = planes[i]->end_pos.x - planes[i]->start_pos.x;
-        vector.y = planes[i]->end_pos.y - planes[i]->start_pos.y;
-        vector.x = sqrt(pow(vector.x, 2) + pow(vector.y, 2));
-        vector.y = 0;
-        sfRectangleShape_setSize(planes[i]->trajectory, vector);
-        sfRectangleShape_setRotation(planes[i]->trajectory,
-            planes[i]->orientation);
-        vector = planes[i]->start_pos;
-        sfRectangleShape_setPosition(planes[i]->trajectory, vector);
-    }
-    return TRUE;
-}
-
-static bool_t set_sprites_positions(aircraft_t **planes, tower_t **towers)
-{
-    sfVector2f position = {0, 0};
-
-    for (int i = 0; planes[i] != NULL; ++i) {
-        position.x = PLANE_BOX_SIZE / 2.0;
-        position.y = PLANE_BOX_SIZE / 2.0;
-        sfRectangleShape_setOrigin(planes[i]->box, position);
-        position.x = planes[i]->position.x + planes[i]->origin.x;
-        position.y = planes[i]->position.y + planes[i]->origin.y;
-        sfSprite_setPosition((*planes[i]).sf_sprite, position);
-        sfRectangleShape_setPosition(planes[i]->box, planes[i]->position);
-    }
-    for (int i = 0; towers[i] != NULL; ++i) {
-        position.x = (*towers[i]).position.x - (TOWER_SIZE / 2.0);
-        position.y = (*towers[i]).position.y - (TOWER_SIZE / 2.0);
-        sfSprite_setPosition((*towers[i]).sf_sprite, position);
-        position.x = (*towers[i]).position.x - (*towers[i]).area_radius;
-        position.y = (*towers[i]).position.y - (*towers[i]).area_radius;
-        sfCircleShape_setPosition((*towers[i]).zone, position);
-    }
-    return set_planes_trajectories(planes);
-}
-
-static bool_t set_sprites_boxes(aircraft_t **planes, tower_t **towers)
-{
-    sfVector2f size = {PLANE_BOX_SIZE, PLANE_BOX_SIZE};
-    sfColor plane_box_color = sfColor_fromRGB(PLANE_BOX_COLOR[0],
-        PLANE_BOX_COLOR[1], PLANE_BOX_COLOR[2]);
-    sfColor tower_box_color = sfColor_fromRGB(TOWER_AREA_COLOR[0],
-        TOWER_AREA_COLOR[1], TOWER_AREA_COLOR[2]);
-
-    for (int i = 0; planes[i] != NULL; ++i) {
-        sfRectangleShape_setSize(planes[i]->box, size);
-        sfRectangleShape_setRotation(planes[i]->box, planes[i]->orientation);
-        sfRectangleShape_setOutlineColor(planes[i]->box, plane_box_color);
-        sfRectangleShape_setOutlineThickness(planes[i]->box, BOX_LINE_SIZE);
-        sfRectangleShape_setFillColor(planes[i]->box, sfTransparent);
-    }
-    for (int i = 0; towers[i] != NULL; ++i) {
-        sfCircleShape_setRadius(towers[i]->zone, towers[i]->area_radius);
-        sfCircleShape_setOutlineColor(towers[i]->zone, tower_box_color);
-        sfCircleShape_setOutlineThickness(towers[i]->zone, BOX_LINE_SIZE);
-        sfCircleShape_setFillColor(towers[i]->zone, sfTransparent);
-    }
-    return set_sprites_positions(planes, towers);
-}
-
-static bool_t set_sprites_textures(aircraft_t **planes, tower_t **towers)
-{
-    double plane_scale_factor = (1.0 * PLANE_SIZE) / PLANE_WIDTH;
-    double tower_scale_factor = (1.0 * TOWER_SIZE) / TOWER_WIDTH;
-    sfVector2f plane_scale_vector = {plane_scale_factor, plane_scale_factor};
-    sfVector2f tower_scale_vector = {tower_scale_factor, tower_scale_factor};
-    sfTexture *plane_texture = sfTexture_createFromFile(PLANE_PATH, NULL);
-    sfTexture *tower_texture = sfTexture_createFromFile(TOWER_PATH, NULL);
-
-    if (plane_texture == NULL || tower_texture == NULL)
-        return FALSE;
-    for (int i = 0; planes[i] != NULL; ++i) {
-        sfSprite_setTexture((*planes[i]).sf_sprite, plane_texture, sfFalse);
-        sfSprite_setScale((*planes[i]).sf_sprite, plane_scale_vector);
-        sfSprite_setRotation((*planes[i]).sf_sprite, (*planes[i]).orientation);
-    }
-    for (int i = 0; towers[i] != NULL; ++i) {
-        sfSprite_setTexture((*towers[i]).sf_sprite, tower_texture, sfFalse);
-        sfSprite_setScale((*towers[i]).sf_sprite, tower_scale_vector);
-    }
-    return set_sprites_boxes(planes, towers);
-}
-
-static sfTexture **get_textures(void)
-{
-    sfTexture **textures = malloc(sizeof(sfTexture *) * (5));
-
-    if (textures == NULL)
-        return NULL;
-    textures[0] = sfTexture_createFromFile(BACKGROUND_PATH, NULL);
-    textures[1] = sfTexture_createFromFile(PLANE_PATH, NULL);
-    textures[2] = sfTexture_createFromFile(TOWER_PATH, NULL);
-    textures[3] = sfTexture_createFromFile(CRASH_PATH, NULL);
-    textures[4] = NULL;
-    if (textures[0] == NULL || textures[1] == NULL) {
-        if (textures[0] != NULL)
-            sfTexture_destroy(textures[0]);
-        if (textures[1] != NULL)
-            sfTexture_destroy(textures[0]);
-        if (textures[2] != NULL)
-            sfTexture_destroy(textures[1]);
-        free(textures);
-        return NULL;
-    }
-    return textures;
-}
-
-static void free_elements(sfRenderWindow *window, sfTexture **textures,
+static void free_elements(sfRenderWindow *window, textures_versions_t *textures,
     void **script_data, sfSprite *background)
 {
     aircraft_t **planes = script_data[0];
     tower_t **towers = script_data[1];
 
     sfRenderWindow_destroy(window);
-    for (int i = 0; textures[i] != NULL; ++i) {
-        sfTexture_destroy(textures[i]);
-    }
-    free(textures);
+    textures_versions_destroy(textures);
     for (int i = 0; planes[i] != NULL; ++i) {
         sfSprite_destroy((*planes[i]).sf_sprite);
         free(planes[i]);
@@ -179,18 +36,15 @@ static void free_elements(sfRenderWindow *window, sfTexture **textures,
     sfSprite_destroy(background);
 }
 
-static int radar_launch(void **script_data)
+static int radar_launch(void **script_data, textures_versions_t *textures)
 {
     sfVideoMode mode = {SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP};
     sfRenderWindow *window = sfRenderWindow_create(mode, "My Radar",
         sfClose | sfTitlebar, NULL);
-    sfTexture **textures = get_textures();
     sfSprite *background = NULL;
     int r_val = 0;
 
-    if (textures == NULL)
-        return EPITECH_ECHEC;
-    background = get_background(textures[0]);
+    background = get_background(textures);
     if (background == NULL)
         return EPITECH_ECHEC;
     r_val = render_radar(window, background, script_data, textures);
@@ -210,6 +64,9 @@ static void print_help(void)
     my_putstr("  'L' key        enable/disable hitboxes and areas.\n");
     my_putstr("  'S' key        enable/disable sprites.\n");
     my_putstr("  'T' key        enable/disable planes trajectories.\n");
+    my_putstr("  'B' key        switch the background image\n");
+    my_putstr("  'P' key        switch the planes image\n");
+    my_putstr("  'C' key        switch the control towers image\n");
     my_putstr("  'Q' or 'escape' key        quit\n");
 }
 
@@ -233,40 +90,39 @@ static int show_data(void **data)
     return EPITECH_SUCCESS;
 }
 
-static int check_arguments(int ac, char **av)
+static arguments_verif_t check_arguments(int ac, char **av)
 {
     if (ac <= 1) {
         my_putstr_error("my_radar: missing parameter\n");
-        return EPITECH_ECHEC;
-    }
-    if (my_strcmp(av[1], "-h") == 0 ||
+        return INVALID_ARGS;
+    } else if (my_strcmp(av[1], "-h") == 0 ||
         (ac > 2 && my_strcmp(av[2], "-r") == 0)) {
         print_help();
-        return EPITECH_SUCCESS;
+        return HELP_OPTION;
     }
-    return 1;
+    return VALID_ARGS;
 }
 
 int main(int ac, char **av)
 {
     char *path_to_script = NULL;
     void **script_data = NULL;
-    int verif = check_arguments(ac, av);
+    arguments_verif_t verif = check_arguments(ac, av);
+    textures_versions_t *textures = get_textures();
 
-    if (verif == EPITECH_ECHEC || verif == EPITECH_SUCCESS) {
-        if (verif != EPITECH_SUCCESS)
-            my_putstr_error("my_radar: invalid parameters\n");
+    if (textures == NULL)
+        return EPITECH_ECHEC;
+    if (verif != VALID_ARGS)
         return verif;
-    }
     path_to_script = av[ac - 1];
     script_data = get_script_data_content(path_to_script);
     if (script_data == NULL) {
         my_putstr_error("my_radar: can not get the script file data\n");
         return EPITECH_ECHEC;
     }
-    if (set_sprites_textures(script_data[0], script_data[1]) == FALSE) {
+    if (!set_textures_and_pos(script_data[0], script_data[1], textures)) {
         my_putstr_error("my_radar: can not get textures\n");
         return EPITECH_ECHEC;
     }
-    return radar_launch(script_data);
+    return radar_launch(script_data, textures);
 }
