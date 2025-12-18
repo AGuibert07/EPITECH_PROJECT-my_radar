@@ -10,25 +10,60 @@
 #include "textures.h"
 #include "events_traitment.h"
 
+static void l_touch(event_arguments_t *arguments)
+{
+    arguments->show_boxes = NOT(arguments->show_boxes);
+}
+
+static void s_touch(event_arguments_t *arguments)
+{
+    arguments->show_sprites = NOT(arguments->show_sprites);
+}
+
+static void t_touch(event_arguments_t *arguments)
+{
+    arguments->show_trajectories = NOT(arguments->show_trajectories);
+}
+
+static void a_touch(event_arguments_t *arguments)
+{
+    arguments->show_crash = NOT(arguments->show_crash);
+}
+
+static void p_touch(event_arguments_t *arguments)
+{
+    update_plane_texture(arguments->script_data[0], arguments->textures);
+}
+
+static void c_touch(event_arguments_t *arguments)
+{
+    update_tower_texture(arguments->script_data[1], arguments->textures);
+}
+
+static void b_touch(event_arguments_t *arguments)
+{
+    update_background_texture(arguments->background, arguments->textures);
+}
+
 static int get_keyboard_events(sfEvent *event, sfRenderWindow *window,
     event_arguments_t *arguments)
 {
-    if (event->key.code == sfKeyEscape || event->key.code == sfKeyQ)
-        sfRenderWindow_close(window);
-    if (event->key.code == sfKeyL)
-        arguments->show_boxes = NOT(arguments->show_boxes);
-    if (event->key.code == sfKeyS)
-        arguments->show_sprites = NOT(arguments->show_sprites);
-    if (event->key.code == sfKeyT)
-        arguments->show_trajectories = NOT(arguments->show_trajectories);
-    if (event->key.code == sfKeyP)
-        update_plane_texture(arguments->script_data[0], arguments->textures);
-    if (event->key.code == sfKeyC)
-        update_tower_texture(arguments->script_data[1], arguments->textures);
-    if (event->key.code == sfKeyB)
-        update_background_texture(arguments->background, arguments->textures);
-    if (event->key.code == sfKeyA)
-        arguments->show_crash = NOT(arguments->show_crash);
+    sfKeyCode key_codes[NBR_TOUCH_EVENTS - 1] = {sfKeyL, sfKeyS, sfKeyT,
+        sfKeyP, sfKeyC, sfKeyB, sfKeyA};
+    void (*functions[NBR_TOUCH_EVENTS - 1])(event_arguments_t *) = {&l_touch,
+        &s_touch, &t_touch, &p_touch, &c_touch, &b_touch, &a_touch};
+    key_touch_t *elt = NULL;
+
+    if (event->key.code == sfKeyEscape || event->key.code == sfKeyQ) {
+        sfRenderWindow_destroy(window);
+        return EPITECH_SUCCESS;
+    }
+    for (int i = 0; i < (NBR_TOUCH_EVENTS - 1); ++i) {
+        if (event->key.code == key_codes[i]) {
+            functions[i](arguments);
+            return EPITECH_SUCCESS;
+        }
+    }
     return EPITECH_SUCCESS;
 }
 
