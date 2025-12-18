@@ -12,6 +12,7 @@
     #include <SFML/Graphics.h>
     #include "textures.h"
     #include "sprites_structs.h"
+    #include "report.h"
 
 struct segment {
     sfVector2f point1;
@@ -24,6 +25,6 @@ struct segment {
 // void check_collisions(aircraft_t **planes, tower_t **towers,
 //     sfTexture *texture_crash, sfClock *timer);
 void check_collisions(aircraft_t **planes, tower_t **towers,
-    element_textures_t *textures);
+    element_textures_t *textures, report_t *report);
 
 #endif /* COLLISIONS_ */

@@ -16,6 +16,7 @@
 // #include "render_screen.h"
 #include "collisions.h"
 #include "textures.h"
+#include "report.h"
 
 static bool_t is_plane_in_tower_zone(aircraft_t *plane, tower_t **towers)
 {
@@ -77,21 +78,23 @@ static bool_t check_collision_between_plane(aircraft_t *plane1,
     return is_collision_between_planes(plane1, plane2);
 }
 
-static void crash_plane(aircraft_t *plane, element_textures_t *textures)
+static void crash_plane(aircraft_t *plane, element_textures_t *textures,
+    report_t *report)
 {
     if (plane->status == FLYING) {
         plane->status = CRASHING;
         set_crash_texture(plane, textures);
+        report->plane_crashed += 1;
     }
 }
 
 static void check_plane(aircraft_t **planes, const int index,
-    element_textures_t *textures)
+    element_textures_t *textures, report_t *report)
 {
     for (int i = (index + 1); planes[i] != NULL; ++i) {
         if (check_collision_between_plane(planes[index], planes[i])) {
-            crash_plane(planes[index], textures);
-            crash_plane(planes[i], textures);
+            crash_plane(planes[index], textures, report);
+            crash_plane(planes[i], textures, report);
         }
     }
 }
@@ -116,11 +119,11 @@ static void check_plane(aircraft_t **planes, const int index,
 }
 */
 void check_collisions(aircraft_t **planes, tower_t **towers,
-    element_textures_t *textures)
+    element_textures_t *textures, report_t *report)
 {
     for (int i = 0; planes[i] != NULL; ++i) {
         if (is_plane_in_tower_zone(planes[i], towers) != TRUE)
-            check_plane(planes, i, textures);
+            check_plane(planes, i, textures, report);
     }
 }
 

@@ -15,6 +15,7 @@
 #include "textures.h"
 #include "events_traitment.h"
 #include "collisions.h"
+#include "report.h"
 
 static bool_t is_aircraft_arrived(aircraft_t *plane)
 {
@@ -39,7 +40,8 @@ static void update_plane_position(aircraft_t *plane)
     sfRectangleShape_setPosition(plane->box, plane->position);
 }
 
-static void update_planes_display(aircraft_t **planes, sfClock *timer)
+static void update_planes_display(aircraft_t **planes, sfClock *timer,
+    report_t *report)
 {
     sfVector2f vector = {0, 0};
 
@@ -48,8 +50,10 @@ static void update_planes_display(aircraft_t **planes, sfClock *timer)
             sfClock_getElapsedTime(timer).microseconds >=
             SEC_TO_MICRO_SEC(planes[i]->delay))
             planes[i]->status = FLYING;
-        if (is_aircraft_arrived(planes[i]))
+        if (is_aircraft_arrived(planes[i])) {
             planes[i]->status = ARRIVED;
+            report->plane_arrived += 1;
+        }
         if (planes[i]->status == FLYING)
             update_plane_position(planes[i]);
     }
@@ -122,30 +126,46 @@ static void render_sprites(sfRenderWindow *window, void **script_data,
     }
     for (int i = 0; planes[i] != NULL; ++i) {
         if (planes[i]->status == FLYING || (planes[i]->status == CRASHING &&
-            event_arguments->show_crash))
+                event_arguments->show_crash))
             render_plane(window, planes[i], event_arguments, textures);
-            // render_plane(window, planes[i], event_arguments, timer);
     }
 }
 
 static void refresh_screen(void **script_data, textures_versions_t *textures,
-    sfClock *timer, sfClock *frame_timer)
+    sfClock **timers, report_t *report)
 {
-    if (sfClock_getElapsedTime(frame_timer).microseconds >= FRAME_TIME) {
-        update_planes_display(script_data[0], timer);
+    if (sfClock_getElapsedTime(timers[1]).microseconds >= FRAME_TIME) {
+        update_planes_display(script_data[0], timers[0], report);
         check_collisions(script_data[0], script_data[1],
-            textures->crash_textures);
-        // check_collisions(script_data[0], script_data[1],
-        //     textures->crash_textures->textures[0].sf_texture, timer);
-        sfClock_restart(frame_timer);
+            textures->crash_textures, report);
+        sfClock_restart(timers[1]);
     }
 }
 
-static int destroy_clocks_and_return(sfClock **timers, int r_val)
+static unsigned int count_sprites(const void **list)
+{
+    unsigned int nbr = 0;
+
+    for (int i = 0; list[i] != NULL; ++i) {
+        nbr += 1;
+    }
+    return nbr;
+}
+
+static int end_of_execution(report_t *report, sfClock **timers)
 {
     sfClock_destroy(timers[0]);
     sfClock_destroy(timers[1]);
-    return r_val;
+    print_report(report);
+    return EPITECH_SUCCESS;
+}
+
+static void frame_reset(sfRenderWindow *window, event_arguments_t *arguments,
+    sfSprite *background, sfColor *bg_color)
+{
+    get_events(window, arguments);
+    sfRenderWindow_clear(window, *bg_color);
+    sfRenderWindow_drawSprite(window, background, NULL);
 }
 
 int render_radar(sfRenderWindow *window, sfSprite *background,
@@ -154,21 +174,20 @@ int render_radar(sfRenderWindow *window, sfSprite *background,
     sfColor bg_color = sfColor_fromRGB(BACKGROUND_COLOR[0], BACKGROUND_COLOR[1],
         BACKGROUND_COLOR[2]);
     sfClock *timers[2] = {sfClock_create(), sfClock_create()};
-    event_arguments_t arguments = {TRUE, TRUE, FALSE, TRUE, script_data, textures,
-        background};
+    event_arguments_t arguments = {TRUE, TRUE, FALSE, TRUE, script_data,
+        textures, background};
+    report_t report = {count_sprites((const void **)(script_data[1])),
+        count_sprites((const void **)(script_data[0])), 0, 0};
 
     if (timers[0] == NULL || timers[1] == NULL)
         return EPITECH_ECHEC;
     sfRenderWindow_setFramerateLimit(window, FRAME_FREQ_MAX);
-    while (sfRenderWindow_isOpen(window)) {
-        sfRenderWindow_clear(window, bg_color);
-        sfRenderWindow_drawSprite(window, background, NULL);
-        refresh_screen(script_data, textures, timers[0], timers[1]);
+    while (sfRenderWindow_isOpen(window) &&
+        (report.plane_arrived + report.plane_crashed) < report.plane_nbr) {
+        frame_reset(window, &arguments, background, &bg_color);
+        refresh_screen(script_data, textures, timers, &report);
         render_sprites(window, script_data, &arguments, textures);
-        // render_sprites(window, script_data, &arguments, timers[0]);
         sfRenderWindow_display(window);
-        if (get_events(window, &arguments) != EPITECH_SUCCESS)
-            return destroy_clocks_and_return(timers, EPITECH_ECHEC);
     }
-    return destroy_clocks_and_return(timers, EPITECH_SUCCESS);
+    return end_of_execution(&report, timers);
 }

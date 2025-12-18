@@ -17,9 +17,17 @@ SRC		=	src/main.c						\
 			src/set_textures_and_sprites.c	\
 			src/textures_tools.c
 
+REPORT	=	src/report.c
+
+BONUS	=	bonus/report.c
+
 NAME	=	'my_radar'
 
 OBJ		=	$(SRC:.c=.o)
+
+OBJ_REPORT	=	$(REPORT:.c=.o)
+
+OBJ_BONUS	=	$(BONUS:.c=.o)
 
 all:	my_radar
 
@@ -35,8 +43,8 @@ libmy_cp:
 
 libmy_update:	libmy_pull libmy_cp
 
-my_radar:	libmy.a	$(OBJ)
-	$(CC) $(OBJ) -l csfml-graphics -l csfml-system -l m -L lib -l my -o $(NAME) $(CPPFLAGS)
+my_radar:	libmy.a	$(OBJ) $(OBJ_REPORT)
+	$(CC) $(OBJ) $(OBJ_REPORT) -l csfml-graphics -l csfml-system -l m -L lib -l my -o $(NAME) $(CPPFLAGS)
 
 clean:
 	cd lib/my && rm -f && cd ../../
@@ -54,5 +62,8 @@ ffclean:	fclean
 	rm -f lib/libmy.a
 
 re:	fclean all
+
+bonus:		libmy.a $(OBJ) $(OBJ_BONUS)
+	$(CC) $(OBJ) $(OBJ_BONUS) -l csfml-graphics -l csfml-system -l m -L lib -l my -o $(NAME) $(CPPFLAGS)
 
 .PHONY:	all libmy.a libmy_pull libmy_cp libmy_update my_radar clean fclean ffclean re
