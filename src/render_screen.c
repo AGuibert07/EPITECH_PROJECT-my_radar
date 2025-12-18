@@ -161,10 +161,11 @@ static int end_of_execution(report_t *report, sfClock **timers)
 }
 
 static void frame_reset(sfRenderWindow *window, event_arguments_t *arguments,
-    sfSprite *background, sfColor *bg_color)
+    sfSprite *background, textures_versions_t *textures)
 {
     get_events(window, arguments);
-    sfRenderWindow_clear(window, *bg_color);
+    sfRenderWindow_clear(window, textures->bg_textures->textures[textures->
+            bg_textures->version_id].colors.background_color);
     sfRenderWindow_drawSprite(window, background, NULL);
 }
 
@@ -184,10 +185,11 @@ int render_radar(sfRenderWindow *window, sfSprite *background,
     sfRenderWindow_setFramerateLimit(window, FRAME_FREQ_MAX);
     while (sfRenderWindow_isOpen(window) &&
         (report.plane_arrived + report.plane_crashed) < report.plane_nbr) {
-        frame_reset(window, &arguments, background, &bg_color);
+        frame_reset(window, &arguments, background, textures);
         refresh_screen(script_data, textures, timers, &report);
         render_sprites(window, script_data, &arguments, textures);
         sfRenderWindow_display(window);
     }
+    my_putstr("ok 1\n");
     return end_of_execution(&report, timers);
 }
