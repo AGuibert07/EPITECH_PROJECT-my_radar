@@ -8,10 +8,7 @@
 #include <unistd.h>
 #include "my.h"
 
-int my_putstr(char const *str)
+void my_putstr(char const *str)
 {
-    int i = 0;
-
     write(STD_OUT, str, my_strlen(str));
-    return 0;
 }

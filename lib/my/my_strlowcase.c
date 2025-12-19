@@ -9,14 +9,9 @@
 
 char *my_strlowcase(char *str)
 {
-    int size = my_strlen(str);
-    char sixty_five = 'A';
-    char ninety = 'Z';
-
-    for (int i = 0; i < size; ++i) {
-        if (str[i] >= sixty_five && str[i] <= ninety) {
+    for (int i = 0; str[i] != '\0'; ++i) {
+        if (my_is_in_str(str[i], UP_LETTERS))
             str[i] = str[i] + 32;
-        }
     }
     return str;
 }

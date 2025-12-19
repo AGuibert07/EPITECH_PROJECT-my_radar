@@ -9,8 +9,7 @@ int my_word_array_len(char const **tab)
 {
     int l = 0;
 
-    while (tab[l] != 0) {
-        l = l + 1;
-    }
+    while (tab[l] != 0)
+        l += 1;
     return l;
 }

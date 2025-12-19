@@ -7,17 +7,16 @@
 
 #include "my.h"
 
-int my_str_islower(char const *str)
+bool_t my_str_islower(char const *str)
 {
     int size = my_strlen(str);
 
     if (size == 0) {
-        return 0;
+        return FALSE;
     }
     for (int i = 0; i < size; ++i) {
-        if (!(str[i] >= 'a' && str[i] <= 'z')) {
-            return 0;
-        }
+        if (!my_is_in_str(str[i], LOW_LETTERS))
+            return FALSE;
     }
-    return 1;
+    return TRUE;
 }

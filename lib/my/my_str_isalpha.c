@@ -7,28 +7,15 @@
 
 #include "my.h"
 
-static int is_alphabetic(char c)
-{
-    if (c >= 'a' && c <= 'z') {
-        return 1;
-    } else if (c >= 'A' && c <= 'Z') {
-        return 1;
-    } else {
-        return 0;
-    }
-}
-
-int my_str_isalpha(char const *str)
+bool_t my_str_isalpha(char const *str)
 {
     int size = my_strlen(str);
 
-    if (size == 0) {
-        return 0;
-    }
+    if (size == 0)
+        return FALSE;
     for (int i = 0; i < size; ++i) {
-        if (!(is_alphabetic(str[i]))) {
-            return 0;
-        }
+        if (!(my_is_in_str(str[i], LETTERS)))
+            return FALSE;
     }
-    return 1;
+    return TRUE;
 }

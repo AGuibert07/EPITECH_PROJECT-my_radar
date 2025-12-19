@@ -7,17 +7,34 @@
 
 #include "my.h"
 
-int my_str_isnum(char const *str)
+bool_t my_str_isnum(char const *str)
 {
     int size = my_strlen(str);
 
-    if (size == 0) {
-        return 0;
-    }
+    if (size == 0)
+        return FALSE;
     for (int i = 0; i < size; ++i) {
-        if (str[i] < '0' || str[i] > '9') {
-            return 1;
-        }
+        if (!my_is_in_str(str[i], DIGITS))
+            return FALSE;
     }
-    return 0;
+    return TRUE;
+}
+
+bool_t my_str_isnbr(char const *str)
+{
+    int size = my_strlen(str);
+    int start_pos = 0;
+
+    if (size == 0)
+        return FALSE;
+    if (str[0] == '-') {
+        start_pos = 1;
+        if (size == 1)
+            return FALSE;
+    }
+    for (int i = start_pos; i < size; ++i) {
+        if (!my_is_in_str(str[i], DIGITS))
+            return FALSE;
+    }
+    return TRUE;
 }

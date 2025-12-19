@@ -10,11 +10,10 @@
 static int my_str_index_of(const char c, const char *str, const int size)
 {
     for (int i = 0; i < size; ++i) {
-        if (str[i] == c) {
+        if (str[i] == c)
             return i;
-        }
     }
-    return (-1);
+    return -1;
 }
 
 int my_getnbr_base(char const *str, char const *base)

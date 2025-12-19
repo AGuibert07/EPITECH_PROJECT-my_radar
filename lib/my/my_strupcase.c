@@ -14,9 +14,8 @@ char *my_strupcase(char *str)
     char one_hundred_twenty_two = 'z';
 
     for (int i = 0; i < size; ++i) {
-        if (str[i] >= ninety_seven && str[i] <= one_hundred_twenty_two) {
-            str[i] = str[i] - 32;
-        }
+        if (str[i] >= ninety_seven && str[i] <= one_hundred_twenty_two)
+            str[i] -= 32;
     }
     return str;
 }

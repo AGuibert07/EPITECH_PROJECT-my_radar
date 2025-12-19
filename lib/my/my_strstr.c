@@ -14,9 +14,8 @@ static int check_correspondence(char *str, char const *to_find, int start_pos)
     int i = 0;
 
     while (is_find == 1 && i < pattern_size) {
-        if (str[i + start_pos] != to_find[i]) {
+        if (str[i + start_pos] != to_find[i])
             return 0;
-        }
         i = i + 1;
     }
     return 1;

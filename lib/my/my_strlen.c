@@ -16,5 +16,5 @@ int my_strlen(char const *str)
     while (str[length] != 0) {
         length += 1;
     }
-    return (length);
+    return length;
 }

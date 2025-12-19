@@ -10,7 +10,7 @@
 char *my_revstr(char *str)
 {
     int length = my_strlen(str);
-    char temp;
+    char temp = '\0';
 
     for (int i = 0; i < (length / 2); ++i) {
         temp = str[i];

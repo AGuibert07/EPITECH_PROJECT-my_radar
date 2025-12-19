@@ -5,8 +5,6 @@
 ** main file for the task 01
 */
 
-//#include "my_putchar.c"
-
 void my_swap(int *a, int *b)
 {
     int temp;

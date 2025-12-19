@@ -17,11 +17,9 @@ int my_index_of_word_array(char *str, char **arr)
     while (my_strcmp(str, arr[i]) != 0 && i < size) {
         i += 1;
     }
-    if (i == size) {
+    if (i == size)
         return -1;
-    } else {
-        return i;
-    }
+    return i;
 }
 
 char **my_word_array_concat(char **arr1, char **arr2)

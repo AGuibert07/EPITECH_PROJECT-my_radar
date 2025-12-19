@@ -12,9 +12,8 @@ static int get_nbr_digits(int nbr, int base)
 {
     int nbr_digits = -1;
 
-    if (nbr < 0) {
+    if (nbr < 0)
         nbr = -nbr;
-    }
     while (my_compute_power_rec(base, nbr_digits + 1) <= nbr) {
         nbr_digits += 1;
     }
@@ -71,9 +70,8 @@ int get_integer_part(double variable)
 {
     int i = -1;
 
-    if (variable < 0) {
+    if (variable < 0)
         return -get_integer_part(-variable);
-    }
     while ((i + 1) <= variable) {
         i += 1;
     }
@@ -82,9 +80,8 @@ int get_integer_part(double variable)
 
 static int round_decimal_part(int decimal_part)
 {
-    if (decimal_part % 10 >= 5) {
+    if (decimal_part % 10 >= 5)
         decimal_part += 10;
-    }
     return decimal_part / 10;
 }
 
@@ -98,9 +95,8 @@ char *my_double_to_str_function(double nbr_float, unsigned int nbr_deci)
 
     str = my_str_concat(integer_str, ".");
     nbr_float -= integer_part;
-    if (nbr_float < 0) {
+    if (nbr_float < 0)
         nbr_float = -nbr_float;
-    }
     nbr_float *= my_compute_power_rec(10, nbr_deci + 1);
     deci_part = round_decimal_part(get_integer_part(nbr_float));
     deci_str = my_int_to_str_function(deci_part, "0123456789");

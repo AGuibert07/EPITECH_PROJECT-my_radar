@@ -28,11 +28,10 @@ char *my_substring(char *str, int start_pos, unsigned int n)
 
     if (start_pos >= size) {
         my_putstr_error("IndexError : string index out of range\n");
-        return "";
+        return NULL;
     }
-    if (end_pos > size) {
+    if (end_pos > size)
         end_pos = size;
-    }
     new_string = malloc(sizeof(char) * (n + 1));
     for (int i = start_pos; i < end_pos; ++i) {
         new_string[i - start_pos] = str[i];

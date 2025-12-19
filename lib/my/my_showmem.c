@@ -5,7 +5,7 @@
 ** main file for task 21
 */
 
-int my_chowmem(char const *str, int size)
+int my_showmem(char const *str, int size)
 {
     return 0;
 }

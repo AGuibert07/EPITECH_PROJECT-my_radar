@@ -5,20 +5,22 @@
 ** main file for task 06
 */
 
-int my_is_prime(int nb)
+#include "my.h"
+
+bool_t my_is_prime(int nb)
 {
     int i = nb / 2;
 
     if (nb < 0) {
         return my_is_prime(-nb);
     } else if (nb == 0 || nb == 1) {
-        return (0);
+        return FALSE;
     }
     while (i > 1) {
         if (nb % i == 0) {
-            return (0);
+            return FALSE;
         }
         i = i - 1;
     }
-    return (1);
+    return TRUE;
 }

@@ -7,7 +7,7 @@
 
 #include "my.h"
 
-int my_put_nbr_error(int nb)
+void my_put_nbr_error(int nb)
 {
     int abs_val = nb;
     int nb_digits = 0;
@@ -18,7 +18,7 @@ int my_put_nbr_error(int nb)
         abs_val = -nb;
     }
     while (my_compute_power_rec(10, (nb_digits + 1)) <= abs_val) {
-        nb_digits = nb_digits + 1;
+        nb_digits += 1;
     }
     while (nb_digits >= 0) {
         ten_pow = my_compute_power_rec(10, nb_digits);
@@ -26,5 +26,4 @@ int my_put_nbr_error(int nb)
         abs_val = (abs_val % ten_pow);
         nb_digits = nb_digits - 1;
     }
-    return (0);
 }

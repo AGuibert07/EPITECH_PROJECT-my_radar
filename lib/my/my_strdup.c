@@ -10,10 +10,11 @@
 
 char *my_strdup(char const *str)
 {
-    char *new_str;
     int size = my_strlen(str);
+    char *new_str = malloc(sizeof(char) * (size + 1));
 
-    new_str = malloc(sizeof(char) * (size + 1));
+    if (new_str == NULL)
+        return NULL;
     for (int i = 0; i < size; ++i) {
         new_str[i] = str[i];
     }

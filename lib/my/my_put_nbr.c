@@ -7,7 +7,7 @@
 
 #include "my.h"
 
-int my_put_nbr(long long int nb)
+void my_put_nbr(long long int nb)
 {
     int abs_val = nb;
     int nb_digits = 0;
@@ -26,5 +26,4 @@ int my_put_nbr(long long int nb)
         abs_val = (abs_val % ten_pow);
         nb_digits = nb_digits - 1;
     }
-    return (0);
 }

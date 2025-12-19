@@ -12,9 +12,10 @@
 
 char *convert_char_to_str(char c)
 {
-    char *str;
+    char *str = malloc(sizeof(char) * 2);
 
-    str = malloc(sizeof(char) * 2);
+    if (str == NULL)
+        return NULL;
     str[0] = c;
     str[1] = '\0';
     return str;
@@ -23,10 +24,11 @@ char *convert_char_to_str(char c)
 char *my_char_n_concat(unsigned int n, ...)
 {
     va_list list;
-    char *str;
+    char *str = malloc(sizeof(char) * (n + 1));
 
+    if (str == NULL)
+        return NULL;
     va_start(list, n);
-    str = malloc(sizeof(char) * (n + 1));
     for (unsigned int i = 0; i < n; ++i) {
         str[i] = va_arg(list, int);
     }

@@ -14,16 +14,14 @@ static int comparison(const char *s1, const char *s2, int *sizes, int i)
     char c1;
     char c2;
 
-    if (i < size1) {
+    if (i < size1)
         c1 = s1[i];
-    } else {
+    else
         c1 = '\0';
-    }
-    if (i < size2) {
+    if (i < size2)
         c2 = s2[i];
-    } else {
+    else
         c2 = '\0';
-    }
     return (c1 - c2);
 }
 

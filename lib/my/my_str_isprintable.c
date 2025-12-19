@@ -7,12 +7,11 @@
 
 #include "my.h"
 
-int my_str_isprintable(char const *str)
+bool_t my_str_isprintable(char const *str)
 {
     for (int i = 0; i < my_strlen(str); ++i) {
-        if ((str[i] <= 31 || str[i] == 127) == 1) {
-            return 0;
-        }
+        if ((str[i] <= 31 || str[i] == 127) == 1)
+            return FALSE;
     }
-    return 1;
+    return TRUE;
 }

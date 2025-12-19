@@ -21,21 +21,12 @@
 }
 */
 
-static int absolute_value(int n)
-{
-    if (n >= 0) {
-        return n;
-    } else {
-        return -n;
-    }
-}
-
 static int compute_power(int nb, int p)
 {
     int r = 1;
 
     r = my_compute_power_rec(nb, p - 1);
-    if (absolute_value(r) >= 2147483647 / absolute_value(nb)) {
+    if (ABS(r) >= 2147483647 / ABS(nb)) {
         return (0);
     } else {
         return r * nb;

@@ -28,9 +28,8 @@ static char *create_empty_buffer(int size)
 {
     char *buffer = malloc(sizeof(char) * (size + 1));
 
-    if (buffer == NULL) {
+    if (buffer == NULL)
         return NULL;
-    }
     for (int i = 0; i <= size; ++i) {
         buffer[i] = '\0';
     }
