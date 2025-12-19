@@ -54,21 +54,19 @@ static int radar_launch(void **script_data, textures_versions_t *textures)
 
 static void print_help(void)
 {
-    my_putstr("Air traffic simulation panel\n");
-    my_putstr("USAGE\n");
-    my_putstr("  ./my_radar [OPTIONS] path_to_script\n");
-    my_putstr("    path_to_script    The path to the script file.\n");
-    my_putstr("OPTIONS\n");
-    my_putstr("  -h                print the usage and quit.\n");
-    my_putstr("USER INTERACTIONS\n");
-    my_putstr("  'L' key        enable/disable hitboxes and areas.\n");
-    my_putstr("  'S' key        enable/disable sprites.\n");
-    my_putstr("  'T' key        enable/disable planes trajectories.\n");
-    my_putstr("  'A' key        enable/disable crash animation\n");
-    my_putstr("  'B' key        switch the background image\n");
-    my_putstr("  'P' key        switch the planes image\n");
-    my_putstr("  'C' key        switch the control towers image\n");
-    my_putstr("  'Q' or 'escape' key        quit\n");
+    my_putstr("Air traffic simulation panel\nUSAGE\n  ./my_radar [OPTIONS] ");
+    my_putstr("path_to_script\n    path_to_script    The path to the script ");
+    my_putstr("file.\nOPTIONS\n  -h                print the usage and quit.");
+    my_putstr("\nUSER INTERACTIONS\n  'L' key        enable/disable hitboxes");
+    my_putstr(" and areas.\n  'S' key        enable/disable sprites.\n  'A' ");
+    my_putstr("key        enable/disable crash animation\n  'E' key        ");
+    my_putstr("enable/disable the window closure when all planes are crashed");
+    my_putstr(" or arrived                 The previous options are enabled ");
+    my_putstr("by default.\n  'T' key        enable/disable planes ");
+    my_putstr("trajectories (disabled by default).\n  'B' key        switch ");
+    my_putstr("the background image\n  'P' key        switch the planes ");
+    my_putstr("image\n  'C' key        switch the control towers image\n  ");
+    my_putstr("'Q' or 'escape' key        quit\n");
 }
 
 static int show_data(void **data)
