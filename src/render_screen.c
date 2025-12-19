@@ -50,7 +50,7 @@ static void update_planes_display(aircraft_t **planes, sfClock *timer,
             sfClock_getElapsedTime(timer).microseconds >=
             SEC_TO_MICRO_SEC(planes[i]->delay))
             planes[i]->status = FLYING;
-        if (is_aircraft_arrived(planes[i])) {
+        if (is_aircraft_arrived(planes[i]) && planes[i]->status == FLYING) {
             planes[i]->status = ARRIVED;
             report->plane_arrived += 1;
         }
@@ -59,23 +59,6 @@ static void update_planes_display(aircraft_t **planes, sfClock *timer,
     }
 }
 
-/*static void check_crash_time(aircraft_t *plane, sfClock *timer)
-{
-    if (MICRO_SEC_TO_SEC(sfClock_getElapsedTime(timer).microseconds -
-            (*plane).time_start_crash) >= TIME_TO_CRASH)
-        (*plane).status = CRASHED;
-}
-*/
-/*static void render_towers(sfRenderWindow *window, tower_t **towers,
-    bool_t *bool_options)
-{
-    for (int i = 0; towers[i] != NULL; ++i) {
-        if (bool_options[0])
-            sfRenderWindow_drawCircleShape(window, towers[i]->zone, NULL);
-        sfRenderWindow_drawSprite(window, towers[i]->sf_sprite, NULL);
-    }
-}
-*/
 static void render_plane(sfRenderWindow *window, aircraft_t *plane,
     event_arguments_t *event_arguments, textures_versions_t *textures)
 {
@@ -95,23 +78,6 @@ static void render_plane(sfRenderWindow *window, aircraft_t *plane,
         sfRenderWindow_drawSprite(window, plane->sf_sprite, NULL);
 }
 
-/*static void render_plane(sfRenderWindow *window, aircraft_t *plane,
-    event_arguments_t *event_arguments, sfClock *timer)
-{
-    if (plane->status == CRASHING) {
-        update_crash_texture(plane, )
-    }
-        check_crash_time(plane, timer);
-    if (event_arguments->show_trajectories)
-        sfRenderWindow_drawRectangleShape(window, plane->trajectory, NULL);
-    if (event_arguments->show_boxes)
-        sfRenderWindow_drawRectangleShape(window, plane->box, NULL);
-    if (event_arguments->show_sprites)
-        sfRenderWindow_drawSprite(window, plane->sf_sprite, NULL);
-}
-*/
-// static void render_sprites(sfRenderWindow *window, void **script_data,
-//     event_arguments_t *event_arguments, sfClock *timer)
 static void render_sprites(sfRenderWindow *window, void **script_data,
     event_arguments_t *event_arguments, textures_versions_t *textures)
 {
@@ -190,6 +156,5 @@ int render_radar(sfRenderWindow *window, sfSprite *background,
         render_sprites(window, script_data, &arguments, textures);
         sfRenderWindow_display(window);
     }
-    my_putstr("ok 1\n");
     return end_of_execution(&report, timers);
 }

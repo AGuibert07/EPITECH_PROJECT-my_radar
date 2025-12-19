@@ -157,13 +157,18 @@ textures_versions_t *get_textures(void)
 void set_crash_texture(aircraft_t *plane, element_textures_t *textures)
 {
     double factor = ((1.0 * CRASH_SIZE) / FRAME_WIDTH);
+    double diag = sqrt(pow(CRASH_SIZE / 2.0, 2) * 2.0);
+    double angle = FLOAT_MODULO(plane->orientation - 135, 360);
     sfVector2f vector = {factor, factor};
 
     sfSprite_setTexture(plane->sf_sprite, textures->textures[0].sf_texture,
         sfTrue);
     sfSprite_setScale(plane->sf_sprite, vector);
-    plane->origin.x = -(FRAME_WIDTH * factor) / 2;
-    plane->origin.y = -(FRAME_HEIGHT * factor) / 2;
+    if (angle < -180)
+        angle += 360;
+    angle = DEGREE_TO_RAD(angle);
+    plane->origin.x = cos(angle) * diag;
+    plane->origin.y = sin(angle) * diag;
     vector.x = plane->position.x + plane->origin.x;
     vector.y = plane->position.y + plane->origin.y;
     sfSprite_setPosition(plane->sf_sprite, vector);
