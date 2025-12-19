@@ -141,7 +141,7 @@ int render_radar(sfRenderWindow *window, sfSprite *background,
     sfColor bg_color = sfColor_fromRGB(BACKGROUND_COLOR[0], BACKGROUND_COLOR[1],
         BACKGROUND_COLOR[2]);
     sfClock *timers[2] = {sfClock_create(), sfClock_create()};
-    event_arguments_t arguments = {TRUE, TRUE, FALSE, TRUE, script_data,
+    event_arguments_t arguments = {TRUE, TRUE, FALSE, TRUE, TRUE, script_data,
         textures, background};
     report_t report = {count_sprites((const void **)(script_data[1])),
         count_sprites((const void **)(script_data[0])), 0, 0};
@@ -150,7 +150,8 @@ int render_radar(sfRenderWindow *window, sfSprite *background,
         return EPITECH_ECHEC;
     sfRenderWindow_setFramerateLimit(window, FRAME_FREQ_MAX);
     while (sfRenderWindow_isOpen(window) &&
-        (report.plane_arrived + report.plane_crashed) < report.plane_nbr) {
+        ((report.plane_arrived + report.plane_crashed) < report.plane_nbr ||
+            arguments.close_at_end == FALSE)) {
         frame_reset(window, &arguments, background, textures);
         refresh_screen(script_data, textures, timers, &report);
         render_sprites(window, script_data, &arguments, textures);

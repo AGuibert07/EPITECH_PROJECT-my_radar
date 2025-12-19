@@ -9,13 +9,16 @@ CC		=	epiclang
 
 CPPFLAGS	=	-Iinclude/
 
-SRC		=	src/main.c						\
-			src/script_data.c				\
-			src/collisions.c				\
-			src/render_screen.c				\
-			src/events_traitment.c			\
-			src/set_textures_and_sprites.c	\
-			src/textures_tools.c
+SRC		=	src/main.c											\
+			src/script_data.c									\
+			src/collisions.c									\
+			src/render_screen.c									\
+			src/events_traitment.c								\
+			src/set_textures_and_sprites.c						\
+			src/textures_tools.c								\
+			src/keyboard_events/enable_and_disable_elements.c	\
+			src/keyboard_events/switch_textures.c				\
+			src/keyboard_events/other_keyboard_events.c
 
 REPORT	=	src/report.c
 
@@ -58,7 +61,7 @@ fclean:
 	rm -fr .vscode
 
 ffclean:	fclean
-	rm -f *.o lib/my/*.o $(NAME) src/*.o
+	rm -f *.o lib/my/*.o $(NAME) src/*.o src/*/*.o
 	rm -f lib/libmy.a
 
 re:	fclean all
