@@ -24,15 +24,19 @@ static void free_elements(sfRenderWindow *window, textures_versions_t *textures,
     sfRenderWindow_destroy(window);
     textures_versions_destroy(textures);
     for (int i = 0; planes[i] != NULL; ++i) {
-        sfSprite_destroy((*planes[i]).sf_sprite);
+        sfSprite_destroy(planes[i]->sf_sprite);
+        sfRectangleShape_destroy(planes[i]->box);
+        sfRectangleShape_destroy(planes[i]->trajectory);
         free(planes[i]);
     }
     free(planes);
     for (int i = 0; towers[i] != NULL; ++i) {
-        sfSprite_destroy((*towers[i]).sf_sprite);
+        sfSprite_destroy(towers[i]->sf_sprite);
+        sfCircleShape_destroy(towers[i]->zone);
         free(towers[i]);
     }
     free(towers);
+    free(script_data);
     sfSprite_destroy(background);
 }
 

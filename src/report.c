@@ -25,8 +25,6 @@ void print_report(report_t *report)
     print_value("Planes :  ", report->plane_nbr);
     print_value("Arrived : ", report->plane_arrived);
     print_value("Crashed : ", report->plane_crashed);
-    if (sum < report->plane_nbr) {
-        my_putstr("-------------------------------\n");
+    if (sum < report->plane_nbr)
         print_value("Lost :    ", report->plane_nbr - sum);
-    }
 }

@@ -14,7 +14,6 @@
     #define MY_PI 3.14159265358979323846
     #define RAD_TO_DEGREE(a) ((180.0 * a) / MY_PI)
     #define DEGREE_TO_RAD(a) ((MY_PI * a) / 180.0)
-    #include "script_data.h"
 
 enum aircraft_status {
     NOT_STARTED,
@@ -48,6 +47,8 @@ struct tower {
     sfCircleShape *zone;
 } typedef tower_t;
 
+int aircraft_create(const char **data, aircraft_t **list, int index);
+int tower_create(const char **data, tower_t **list, int index);
 void **get_script_data_content(const char *file_name);
 
 #endif /* SPRITES_STRUCTS_ */

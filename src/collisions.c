@@ -78,62 +78,30 @@ static bool_t check_collision_between_plane(aircraft_t *plane1,
     return is_collision_between_planes(plane1, plane2);
 }
 
-static void crash_plane(aircraft_t *plane, element_textures_t *textures,
-    report_t *report)
+static void crash_plane(aircraft_t *plane, element_textures_t *textures)
 {
     if (plane->status == FLYING) {
         plane->status = CRASHING;
         set_crash_texture(plane, textures);
-        report->plane_crashed += 1;
     }
 }
 
 static void check_plane(aircraft_t **planes, const int index,
-    element_textures_t *textures, report_t *report)
+    element_textures_t *textures)
 {
     for (int i = (index + 1); planes[i] != NULL; ++i) {
         if (check_collision_between_plane(planes[index], planes[i])) {
-            crash_plane(planes[index], textures, report);
-            crash_plane(planes[i], textures, report);
+            crash_plane(planes[index], textures);
+            crash_plane(planes[i], textures);
         }
     }
 }
 
-/*static void check_plane(aircraft_t **planes, const int index, sfClock *timer,
-    sfTexture *texture_crash)
-{
-    for (int i = (index + 1); planes[i] != NULL; ++i) {
-        if (check_collision_between_plane(planes[index], planes[i])) {
-            (*planes[index]).status = CRASHING;
-            (*planes[i]).status = CRASHING;
-            sfSprite_setTexture((*planes[index]).sf_sprite, texture_crash,
-                sfFalse);
-            sfSprite_setTexture((*planes[i]).sf_sprite, texture_crash,
-                sfFalse);
-            (*planes[index]).time_start_crash =
-                sfClock_getElapsedTime(timer).microseconds;
-            (*planes[i]).time_start_crash =
-                sfClock_getElapsedTime(timer).microseconds;
-        }
-    }
-}
-*/
 void check_collisions(aircraft_t **planes, tower_t **towers,
-    element_textures_t *textures, report_t *report)
+    element_textures_t *textures)
 {
     for (int i = 0; planes[i] != NULL; ++i) {
         if (is_plane_in_tower_zone(planes[i], towers) != TRUE)
-            check_plane(planes, i, textures, report);
+            check_plane(planes, i, textures);
     }
 }
-
-/*
-void check_collisions(aircraft_t **planes, tower_t **towers,
-    sfTexture *texture_crash, sfClock *timer)
-{
-    for (int i = 0; planes[i] != NULL; ++i) {
-        if (is_plane_in_tower_zone(planes[i], towers) != TRUE)
-            check_plane(planes, i, timer, texture_crash);
-    }
-}
-*/

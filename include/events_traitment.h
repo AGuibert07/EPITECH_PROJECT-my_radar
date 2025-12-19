@@ -11,6 +11,7 @@
     #include <SFML/Graphics.h>
     #include "my.h"
     #include "textures.h"
+    #include "report.h"
 
 struct event_arguments {
     bool_t show_sprites;
@@ -21,6 +22,7 @@ struct event_arguments {
     void **script_data;
     textures_versions_t *textures;
     sfSprite *background;
+    report_t *report;
 } typedef event_arguments_t;
 
 struct key_touch {

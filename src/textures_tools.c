@@ -22,6 +22,7 @@ static void element_textures_destroy(element_textures_t *elt_textures)
         if (elt_textures->textures[i].sf_texture != NULL)
             sfTexture_destroy(elt_textures->textures[i].sf_texture);
     }
+    free(elt_textures->textures);
     free(elt_textures);
 }
 

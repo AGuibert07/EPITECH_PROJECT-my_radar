@@ -11,6 +11,7 @@ CPPFLAGS	=	-Iinclude/
 
 SRC		=	src/main.c											\
 			src/script_data.c									\
+			src/sprites_structs.c								\
 			src/collisions.c									\
 			src/render_screen.c									\
 			src/events_traitment.c								\

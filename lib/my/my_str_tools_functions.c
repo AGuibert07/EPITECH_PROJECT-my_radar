@@ -10,16 +10,6 @@
 #include <stdarg.h>
 #include "my.h"
 
-static void init_word_arr(char **arr, int arr_len, int size)
-{
-    char *element;
-
-    for (int i = 0; i < arr_len; ++i) {
-        element = malloc(sizeof(char) * size);
-        arr[i] = element;
-    }
-}
-
 char *my_substring(char *str, int start_pos, unsigned int n)
 {
     int size = my_strlen(str);

@@ -66,6 +66,7 @@ static void render_plane(sfRenderWindow *window, aircraft_t *plane,
         if (plane->crash_frame_index + 1 >=
             textures->crash_textures->versions_nbr) {
             plane->status = CRASHED;
+            event_arguments->report->plane_crashed += 1;
             return;
         }
         update_crash_texture(plane, textures->crash_textures);
@@ -103,7 +104,7 @@ static void refresh_screen(void **script_data, textures_versions_t *textures,
     if (sfClock_getElapsedTime(timers[1]).microseconds >= FRAME_TIME) {
         update_planes_display(script_data[0], timers[0], report);
         check_collisions(script_data[0], script_data[1],
-            textures->crash_textures, report);
+            textures->crash_textures);
         sfClock_restart(timers[1]);
     }
 }
@@ -141,10 +142,10 @@ int render_radar(sfRenderWindow *window, sfSprite *background,
     sfColor bg_color = sfColor_fromRGB(BACKGROUND_COLOR[0], BACKGROUND_COLOR[1],
         BACKGROUND_COLOR[2]);
     sfClock *timers[2] = {sfClock_create(), sfClock_create()};
-    event_arguments_t arguments = {TRUE, TRUE, FALSE, TRUE, TRUE, script_data,
-        textures, background};
     report_t report = {count_sprites((const void **)(script_data[1])),
         count_sprites((const void **)(script_data[0])), 0, 0};
+    event_arguments_t arguments = {TRUE, TRUE, FALSE, TRUE, TRUE, script_data,
+        textures, background, &report};
 
     if (timers[0] == NULL || timers[1] == NULL)
         return EPITECH_ECHEC;

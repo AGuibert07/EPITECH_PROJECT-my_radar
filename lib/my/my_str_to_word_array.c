@@ -41,7 +41,7 @@ static int get_word_length(char const *str, int start_pos)
     return length;
 }
 
-char *cpy_word_content(char const *str, int start_pos, int length)
+static char *cpy_word_content(char const *str, int start_pos, int length)
 {
     char *word = malloc(sizeof(char) * (length + 1));
 
