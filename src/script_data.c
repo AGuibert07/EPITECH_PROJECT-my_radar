@@ -77,6 +77,7 @@ static int aircraft_create(const char **data, aircraft_t **list,
         nfree(1, plane);
         return EPITECH_ECHEC;
     }
+    my_show_word_array(data);
     set_vector(&plane->start_pos, my_getnbr(data[1]), my_getnbr(data[2]));
     set_vector(&plane->end_pos, my_getnbr(data[3]), my_getnbr(data[4]));
     set_vector(&plane->position, plane->start_pos.x, plane->start_pos.y);

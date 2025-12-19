@@ -3,3 +3,5 @@ src/*.o
 src/*/*.o
 lib/my/libmy.a
 lib/libmy_repo
+lib/libmy.a
+my_radar
