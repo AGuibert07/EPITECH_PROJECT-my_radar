@@ -73,26 +73,6 @@ static void print_help(void)
     my_putstr("'Q' or 'escape' key        quit\n");
 }
 
-static int show_data(void **data)
-{
-    aircraft_data_t **planes = data[0];
-    tower_data_t **towers = data[1];
-
-    my_putstr("aircrafts :\n");
-    for (int i = 0; planes[i] != NULL; ++i) {
-        my_putchar('\t');
-        aircraft_data_print(planes[i]);
-        my_putchar('\n');
-    }
-    my_putstr("\ncontrol towers:\n");
-    for (int i = 0; towers[i] != NULL; ++i) {
-        my_putchar('\t');
-        tower_data_print(towers[i]);
-        my_putchar('\n');
-    }
-    return EPITECH_SUCCESS;
-}
-
 static arguments_verif_t check_arguments(int ac, char **av)
 {
     if (ac <= 1) {
